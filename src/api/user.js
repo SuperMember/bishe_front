@@ -18,3 +18,11 @@ export function setUserStatue(userId, statue) {
     }
   })
 }
+
+// 根据id获取用户信息
+export function getUserById(userId) {
+  return request({
+    url: '/admin/manager/user?userId=' + userId,
+    method: 'get'
+  })
+}

@@ -19,6 +19,7 @@
     border
     @expand-change="handlerExpandChange"
     >
+    
     <el-table-column
       type="expand">
        <template >
@@ -36,6 +37,8 @@
             <el-card :body-style="{ padding: '0px' }">
               <img :src="o.IMG" class="image">
               <span class="name">{{o.USERNAME}}</span>
+              <span style="float:right;margin-right:15px;margin-top:10px">{{o.COUNT}}</span>
+              <svg-icon icon-class="icon_zan" style="width:20px;height:20px;margin-top:10px;margin-right:10px;float:right"></svg-icon>
               <div style="padding: 14px;" class="content">
                 <span>{{o.CONTENT}}</span>
                 <br/>
@@ -63,14 +66,75 @@
       width="120">
     </el-table-column>
     <el-table-column
-      prop="BELONG_ID"
       label="被评论用户ID"
       width="120">
+      <template slot-scope="scope">
+        <el-popover
+          ref="popover"
+          placement="right"
+          width="400"
+          trigger="click">
+          <el-card :body-style="{ padding: '0px' }">
+            <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
+            <div style="padding: 14px;">
+              <span style="float:left">{{transData.USERNAME}}</span>
+              <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
+              <br/>
+              <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
+              <span>{{userData.STATUE}}</span>
+              <br/>
+              <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
+              <span>{{userData.DEGREE}}</span>
+              <br/>
+              <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
+              <span>{{userData.PHONE}}</span>
+              <br/>
+              <svg-icon icon-class="icon_points" class="svg"></svg-icon>
+              <span>{{userData.POINTS}}</span>
+              <div class="bottom clearfix">
+                <time class="time">{{ userData.CREATED }}</time>
+              </div>
+            </div>
+          </el-card>
+        </el-popover>
+        <el-button v-popover:popover @click="handleHover(scope.row.BELONG_ID)">{{scope.row.BELONG_ID}}</el-button>
+      </template>
     </el-table-column>
     <el-table-column
-      prop="USER_ID"
       label="评论用户ID"
-      width="120">
+      width="120"
+      >
+      <template slot-scope="scope">
+         <el-popover
+          ref="popover"
+          placement="right"
+          width="400"
+          trigger="click">
+          <el-card :body-style="{ padding: '0px' }">
+            <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
+            <div style="padding: 14px;">
+              <span style="float:left">{{transData.USERNAME}}</span>
+              <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
+              <br/>
+              <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
+              <span>{{userData.STATUE}}</span>
+              <br/>
+              <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
+              <span>{{userData.DEGREE}}</span>
+              <br/>
+              <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
+              <span>{{userData.PHONE}}</span>
+              <br/>
+              <svg-icon icon-class="icon_points" class="svg"></svg-icon>
+              <span>{{userData.POINTS}}</span>
+              <div class="bottom clearfix">
+                <time class="time">{{ userData.CREATED }}</time>
+              </div>
+            </div>
+          </el-card>
+        </el-popover>
+        <el-button v-popover:popover @click="handleHover(scope.row.USER_ID)">{{scope.row.USER_ID}}</el-button>
+      </template>
     </el-table-column>
     <el-table-column
       prop="TYPE"
@@ -78,9 +142,11 @@
       width="120">
     </el-table-column>
     <el-table-column
-      prop="URL"
-      label="图片url"
-      width="200">
+      label="图片"
+      width="100">
+      <template slot-scope="scope">
+        <img :src="scope.row.URL" style="width:50px;height:50px;"/>
+      </template>
     </el-table-column>
     <el-table-column
       prop="COUNT"
@@ -96,15 +162,15 @@
     </el-table-column>
   </el-table>
   <pagination  v-on:handleChange="handleCurrentChange" :count="count"></pagination>
-  <el-dialog title="所有回复" :visible.sync="dialogTableVisible" >
   
-</el-dialog>
   </div>
 </template>
 
 <script>
 import { getAllComments, deleteComment, getReplyById } from '@/api/comment'
+import { getUserById } from '@/api/user'
 import pagination from '../../../components/pagination'
+import SvgIcon from '../../../components/SvgIcon'
 export default {
   data() {
     return {
@@ -114,7 +180,9 @@ export default {
       statue: '2',
       dialogTableVisible: false,
       replyData: [],
-      replyCount: 0
+      replyCount: 0,
+      expand: true,
+      userData: {}
     }
   },
   computed: {
@@ -132,10 +200,18 @@ export default {
         }
       }, this)
       return data
+    },
+    transData() {
+      var data = this.userData
+      var sex = data.SEX
+      var statue = data.STATUE
+      if (sex === 0) { data.SEX = 'icon_man' } else { data.SEX = 'icon_woman' }
+      if (statue === false) { data.STATUE = '正常' } else { data.STATUE = '小黑屋' }
+      return data
     }
   },
   components: {
-    getAllComments, pagination, deleteComment, getReplyById
+    getAllComments, pagination, deleteComment, getReplyById, SvgIcon, getUserById
   },
   created() {
     this.getComments(this.statue, this.type, 1)
@@ -190,10 +266,13 @@ export default {
     },
     handlerExpandChange(row, expandedRows) {
       // 处理展开事件
-      getReplyById(row.ID, 1).then(response => {
-        this.replyData = response.data.data
-        this.replyCount = response.data.count
-      })
+      if (this.expand === true) {
+        getReplyById(row.ID, 1).then(response => {
+          this.replyData = response.data.data
+          this.replyCount = response.data.count
+        })
+      }
+      this.expand = !this.expand
     },
     handleReplyDelete(id) {
       // 删除回复
@@ -203,6 +282,11 @@ export default {
       getReplyById(row.ID, 1).then(response => {
         this.replyData = response.data.data
         this.replyCount = response.data.count
+      })
+    },
+    handleHover(id) {
+      getUserById(id).then(response => {
+        this.userData = response.data
       })
     }
   }
@@ -265,6 +349,9 @@ export default {
   .clearfix:after {
       clear: both
   }
-
+.svg{
+  width: 15px;
+  height: 15px;
+}
 </style>
 
