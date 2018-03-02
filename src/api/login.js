@@ -15,13 +15,13 @@ export function getInfo(token) {
   return request({
     url: '/user/info',
     method: 'get',
-    params: { token }
+    headers: { 'X-AUTH-TOKEN': token }
   })
 }
 
 export function logout() {
   return request({
     url: '/user/logout',
-    method: 'post'
+    method: 'get'
   })
 }

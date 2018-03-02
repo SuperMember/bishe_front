@@ -4,23 +4,23 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 const user = {
   state: {
     token: getToken(),
-    name: '',
     avatar: '',
-    roles: []
+    roles: [],
+    info: {}
   },
 
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
     },
-    SET_NAME: (state, name) => {
-      state.name = name
-    },
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_INFO: (state, info) => {
+      state.info = info
     }
   },
 
@@ -45,9 +45,9 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(response => {
           const data = response.data
-          commit('SET_ROLES', data.role)
-          commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
+          commit('SET_ROLES', data.grantedAuthorities)
+          commit('SET_AVATAR', data.img)
+          commit('SET_INFO', data)
           resolve(response)
         }).catch(error => {
           reject(error)

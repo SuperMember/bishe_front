@@ -57,6 +57,22 @@ export const constantRouterMap = [
   },
 
   {
+    path: '/index',
+    component: Layout,
+    redirect: '/index/info',
+    name: 'Info',
+    meta: { title: '个人信息', icon: 'example' },
+    children: [
+      {
+        path: 'info',
+        name: 'Info',
+        component: _import('index/info/index'),
+        meta: { title: '个人信息', icon: 'table' }
+      }
+    ]
+  },
+
+  {
     path: '/comments',
     component: Layout,
     redirect: '/comments/receive',
@@ -81,22 +97,10 @@ export const constantRouterMap = [
   {
     path: '/article',
     component: Layout,
-    redirect: '/article/added',
+    redirect: '/article/list',
     name: 'Article',
     meta: { title: '我的文章', icon: 'example' },
     children: [
-      {
-        path: 'added',
-        name: 'added',
-        component: _import('article/added/index'),
-        meta: { title: '已发表', icon: 'form' }
-      },
-      {
-        path: 'unpublish',
-        name: 'Unpublish',
-        component: _import('article/unpublish/index'),
-        meta: { title: '未发表', icon: 'form' }
-      },
       {
         path: 'publish',
         name: 'Publish',
@@ -104,10 +108,10 @@ export const constantRouterMap = [
         meta: { title: '发表文章', icon: 'form' }
       },
       {
-        path: 'audit',
-        name: 'Audit',
-        component: _import('article/audit/index'),
-        meta: { title: '审核文章', icon: 'form' }
+        path: 'list',
+        name: 'List',
+        component: _import('article/list/index'),
+        meta: { title: '文章列表', icon: 'form' }
       }
     ]
   },
@@ -130,6 +134,18 @@ export const constantRouterMap = [
         name: './allcomments',
         component: _import('manager/allcomments/index'),
         meta: { title: '评论列表', icon: 'form' }
+      },
+      {
+        path: './check',
+        name: './check',
+        component: _import('manager/check/index'),
+        meta: { title: '审核列表', icon: 'form' }
+      },
+      {
+        path: './report',
+        name: './report',
+        component: _import('manager/report/index'),
+        meta: { title: '举报列表', icon: 'form' }
       }
     ]
   },

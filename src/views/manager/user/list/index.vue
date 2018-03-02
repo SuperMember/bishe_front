@@ -1,11 +1,12 @@
 <template>
   <div>
      <el-radio-group v-model="statue" @change="handlerRadioChange(statue)">
-      <el-radio-button label="0">全部</el-radio-button>
-      <el-radio-button label="1">正常</el-radio-button>
-      <el-radio-button label="2">小黑屋</el-radio-button>
+      <el-radio-button label="2">全部</el-radio-button>
+      <el-radio-button label="0">正常</el-radio-button>
+      <el-radio-button label="1">小黑屋</el-radio-button>
     </el-radio-group>
     <el-table
+        :loading="loading"
         :data="transUserData"
         style="width: 100%">
         <el-table-column
@@ -88,7 +89,8 @@ export default {
       tableData: [],
       count: 0,
       page: 1,
-      statue: '0',
+      statue: '2',
+      loading: true,
       currentStatue: false,
       options: [
         {
@@ -121,14 +123,16 @@ export default {
       getUser(statue, page).then(response => {
         this.tableData = response.data.data
         this.count = response.data.count
-      }).catch(() => {
-
+        this.loading = false
       })
     },
     handleCurrentChange(page) {
+      this.page = page
       this.getUserDate(this.statue, page)
     },
     handlerRadioChange(radio) {
+      this.statue = radio
+      this.loading = true
       this.getUserDate(radio, 1)
     },
     handlerSelectChange(row) {
@@ -144,7 +148,7 @@ export default {
               type: 'success',
               message: '修改成功!'
             })
-            this.getUserDate(this.statue, 1)
+            this.getUserDate(this.statue, this.page)
           } else {
             this.$message({
               type: 'success',

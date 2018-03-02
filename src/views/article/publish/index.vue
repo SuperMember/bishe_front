@@ -1,15 +1,17 @@
 <template>
   <div>
       <div>
+        <label class="type" >文章类型:</label>
+        <el-radio-group v-model="type" @change="handlerTypeChange(type)">
+          <el-radio-button label="0">原创</el-radio-button>
+          <el-radio-button label="1">视频</el-radio-button>
+        </el-radio-group>
         <el-form ref="formData" :model="form" label-width="80px" >
           <el-form-item label="大标题" prop="bigtitle">
             <el-input v-model="form.bigtitle" placeholder="请输入大标题" ></el-input>
           </el-form-item>
           <el-form-item label="小标题" prop="smalltitle">
             <el-input v-model="form.smalltitle" placeholder="请输入小标题"></el-input>
-          </el-form-item>
-          <el-form-item label="类型" prop="type">
-            <el-input v-model="form.type" placeholder="请输入类型"></el-input>
           </el-form-item>
           <el-form-item label="文章内容" prop="content">
             <tinymce :height="200" v-model="form.content"></tinymce>
@@ -29,6 +31,7 @@ import Tinymce from '../../../components/Tinymce'
 export default {
   data() {
     return {
+      type: 0,
       form: {}
     }
   },
@@ -39,6 +42,7 @@ export default {
   created() {
   },
   methods: {
+
     onSubmit: function(flag) {
       this.upData(flag)
     },
@@ -81,6 +85,12 @@ export default {
 .el-input{
   width:300px;
   margin:5px;
+}
+.type{
+  margin-left:10px;
+}
+.el-radio-group{
+  margin:10px;
 }
 </style>
 

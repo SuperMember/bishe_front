@@ -5,7 +5,7 @@ import App from './App'
 import router from './router'
 import store from './store'
 import '@/icons' // icon
-// import '@/permission' // 权限
+import '@/permission' // 权限
 
 Vue.use(ElementUI)
 

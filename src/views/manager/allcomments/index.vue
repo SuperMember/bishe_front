@@ -23,6 +23,34 @@
     <el-table-column
       type="expand">
        <template >
+          <el-popover
+            ref="popover"
+            placement="right"
+            width="400"
+            trigger="click">
+            <el-card :body-style="{ padding: '0px' }">
+              <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
+              <div style="padding: 14px;">
+                <span style="float:left">{{transData.USERNAME}}</span>
+                <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
+                <br/>
+                <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
+                <span>{{userData.STATUE}}</span>
+                <br/>
+                <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
+                <span>{{userData.DEGREE}}</span>
+                <br/>
+                <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
+                <span>{{userData.PHONE}}</span>
+                <br/>
+                <svg-icon icon-class="icon_points" class="svg"></svg-icon>
+                <span>{{userData.POINTS}}</span>
+                <div class="bottom clearfix">
+                  <time class="time">{{ userData.CREATED }}</time>
+                </div>
+              </div>
+            </el-card>
+          </el-popover>
         <!-- <el-table :data="replyData">
           <el-table-column property="ID" label="ID" width="150"></el-table-column>
           <el-table-column property="USER_ID" label="用户ID" width="80"></el-table-column>
@@ -37,12 +65,13 @@
             <el-card :body-style="{ padding: '0px' }">
               <img :src="o.IMG" class="image">
               <span class="name">{{o.USERNAME}}</span>
+              <!-- <span class="name">{{o.USERNAME}}</span> -->
               <span style="float:right;margin-right:15px;margin-top:10px">{{o.COUNT}}</span>
               <svg-icon icon-class="icon_zan" style="width:20px;height:20px;margin-top:10px;margin-right:10px;float:right"></svg-icon>
               <div style="padding: 14px;" class="content">
                 <span>{{o.CONTENT}}</span>
                 <br/>
-                <img :src="o.URL==null?'':o.URL" style="height:100px;"/>
+                <img :src="o.URL"  style="height:100px;" v-if="o.URL!=null"/>
                 <div class="bottom clearfix">
                   <time class="time">{{ o.CREATED }}</time>
                   <el-button type="text" class="button" @click="handleReplyDelete(o.ID)">删除</el-button>
@@ -145,7 +174,7 @@
       label="图片"
       width="100">
       <template slot-scope="scope">
-        <img :src="scope.row.URL" style="width:50px;height:50px;"/>
+        <img :src="scope.row.URL" style="width:50px;height:50px;" v-if="scope.row.URL!=''"/>
       </template>
     </el-table-column>
     <el-table-column
@@ -337,7 +366,7 @@ export default {
   }
 
   .name{
-    margin-top: 10px;
+    margin-top: 15px;
     float: left;
   }
   .clearfix:before,
@@ -353,5 +382,6 @@ export default {
   width: 15px;
   height: 15px;
 }
+
 </style>
 
