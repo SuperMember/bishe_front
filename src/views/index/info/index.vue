@@ -1,9 +1,9 @@
 <template>
   <div class="components-container">
 
-    <pan-thumb :image="image"></pan-thumb>
+    <pan-thumb :image="image" style="align:center"></pan-thumb>
 
-    <el-button type="primary" icon="upload" style="position: absolute;bottom: 15px;margin-left: 40px;" @click="imagecropperShow=true">修改头像
+    <el-button type="primary" icon="upload" style="margin-left: 40px;" @click="imagecropperShow=true">修改头像
     </el-button>
 
     <image-cropper :width="300" :height="300" url="http://localhost:9090/file/profile" 
@@ -11,6 +11,31 @@
       @crop-upload-success="cropSuccess"
       @crop-success="crop"
       :key="imagecropperKey" v-show="imagecropperShow" img-format="jpg"></image-cropper>
+
+      <div class="bottom" style="margin:10px;">
+        <el-form ref="form" :model="form" label-width="80px" >
+                <el-form-item label="用户名">
+                  <span>{{form.username}}</span>
+                </el-form-item>
+                <el-form-item label="性别">
+                  
+                </el-form-item>
+                <el-form-item label="角色">
+                  <span>{{roles[0].authority}}</span>
+                </el-form-item>
+                <el-form-item label="注册号码">
+                  <span>{{form.phone}}</span>
+                </el-form-item>
+                <el-form-item label="创建时间">
+                  <span>{{form.created}}</span>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="onSubmit">修改</el-button>
+                  <el-button>取消</el-button>
+                </el-form-item>
+        </el-form>
+      </div>
+      
   </div>
 </template>
 
@@ -26,16 +51,21 @@ export default {
       createdImgUrl: null,
       imagecropperShow: false,
       imagecropperKey: 0,
-      image: ''
+      image: '',
+      form: {
+
+      }
     }
   },
   computed: {
     ...mapGetters([
-      'info'
+      'info',
+      'roles'
     ])
   },
   created() {
-    this.image = this.$store.state.user['info'].img
+    this.image = this.$store.state.user['avatar']
+    this.form = this.$store.state.user['info']
   },
   methods: {
     cropSuccess(resData) {
