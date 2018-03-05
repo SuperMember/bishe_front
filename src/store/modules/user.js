@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/login'
+import { login, logout, getInfo, editProfile } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -75,6 +75,15 @@ const user = {
         commit('SET_TOKEN', '')
         removeToken()
         resolve()
+      })
+    },
+
+    // 修改头像
+    EditProfile({ commit, state }, url) {
+      return new Promise((resolve, reject) => {
+        editProfile(state.token, url).then(response => {
+          commit('SET_AVATAR', url)
+        }).catch(() => {})
       })
     }
   }

@@ -25,3 +25,14 @@ export function logout() {
     method: 'get'
   })
 }
+
+export function editProfile(token, url) {
+  return request({
+    url: '/user/profile',
+    method: 'post',
+    headers: { 'X-AUTH-TOKEN': token },
+    data: {
+      img: url
+    }
+  })
+}
