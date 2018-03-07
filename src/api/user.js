@@ -26,3 +26,26 @@ export function getUserById(userId) {
     method: 'get'
   })
 }
+
+// 提交手机号码
+export function editPhone(phone) {
+  return request({
+    url: '/user/phone',
+    method: 'post',
+    data: {
+      phone: phone
+    }
+  })
+}
+
+// 验证验证码
+export function checkCode(phone, code) {
+  return request({
+    url: '/user/phone/check',
+    method: 'post',
+    data: {
+      phone: phone,
+      code: code
+    }
+  })
+}

@@ -18,6 +18,43 @@ import Layout from '../views/layout/Layout'
     icon: 'svg-name'             the icon show in the sidebar,
   }
 **/
+
+export const asyncRouterMap = [
+  {
+    path: '/manager',
+    component: Layout,
+    redirect: '/manager/user',
+    name: 'Manager',
+    meta: { title: '管理', icon: 'example', role: [{ 'authority': 'admin' }] },
+    children: [
+      {
+        path: 'list',
+        name: 'list',
+        component: _import('manager/user/list/index'),
+        meta: { title: '用户列表', icon: 'form' }
+      },
+      {
+        path: './allcomments',
+        name: './allcomments',
+        component: _import('manager/allcomments/index'),
+        meta: { title: '评论列表', icon: 'form' }
+      },
+      {
+        path: './check',
+        name: './check',
+        component: _import('manager/check/index'),
+        meta: { title: '审核列表', icon: 'form' }
+      },
+      {
+        path: './report',
+        name: './report',
+        component: _import('manager/report/index'),
+        meta: { title: '举报列表', icon: 'form' }
+      }
+    ]
+  }
+
+]
 export const constantRouterMap = [
   { path: '/login', component: _import('login/index'), hidden: true },
   { path: '/404', component: _import('404'), hidden: true },
@@ -32,6 +69,21 @@ export const constantRouterMap = [
       path: 'dashboard',
       component: _import('dashboard/index')
     }]
+  },
+  {
+    path: '/index',
+    component: Layout,
+    redirect: '/index/info',
+    name: 'Info',
+    meta: { title: '个人信息', icon: 'example' },
+    children: [
+      {
+        path: 'info',
+        name: 'Info',
+        component: _import('index/info/index'),
+        meta: { title: '个人信息', icon: 'table' }
+      }
+    ]
   },
 
   {
@@ -55,23 +107,6 @@ export const constantRouterMap = [
       }
     ]
   },
-
-  {
-    path: '/index',
-    component: Layout,
-    redirect: '/index/info',
-    name: 'Info',
-    meta: { title: '个人信息', icon: 'example' },
-    children: [
-      {
-        path: 'info',
-        name: 'Info',
-        component: _import('index/info/index'),
-        meta: { title: '个人信息', icon: 'table' }
-      }
-    ]
-  },
-
   {
     path: '/comments',
     component: Layout,
@@ -115,13 +150,12 @@ export const constantRouterMap = [
       }
     ]
   },
-
   {
     path: '/manager',
     component: Layout,
     redirect: '/manager/user',
     name: 'Manager',
-    meta: { title: '管理', icon: 'example' },
+    meta: { title: '管理', icon: 'example', role: [{ 'authority': 'admin' }] },
     children: [
       {
         path: 'list',
@@ -149,7 +183,6 @@ export const constantRouterMap = [
       }
     ]
   },
-
   { path: '*', redirect: '/404', hidden: true }
 ]
 
