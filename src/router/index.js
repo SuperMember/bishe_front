@@ -118,13 +118,7 @@ export const constantRouterMap = [
         path: 'receive',
         name: 'Receive',
         component: _import('comments/receive/index'),
-        meta: { title: '收到的评论', icon: 'form' }
-      },
-      {
-        path: 'replied',
-        name: 'Replied',
-        component: _import('comments/replied/index'),
-        meta: { title: '已回复的评论', icon: 'form' }
+        meta: { title: '评论', icon: 'form' }
       }
     ]
   },

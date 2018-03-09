@@ -28,3 +28,18 @@ export function getReplyById(commentId, page) {
   })
 }
 
+// 获取某个用户的所有回复
+export function getAllCommentsByUserId(page) {
+  return request({
+    url: '/admin/manager/user/comment?page=' + page,
+    method: 'get'
+  })
+}
+
+// 回复某个用户的评论
+export function replyComment(touserId, commentId, content, url) {
+  return request({
+    url: '/admin/manager/user/comment?page=' + page,
+    method: 'get'
+  })
+}

@@ -7,106 +7,119 @@
       <el-radio-button label="2">未通过</el-radio-button>
       <el-radio-button label="3">审核通过</el-radio-button>
     </el-radio-group>
-    <el-table
-    :loading="loading"
-    :data="transArticle"
-    border
-    style="width: 100%">
-    <el-table-column
-      prop="ID"
-      label="ID"
-      width="150">
-    </el-table-column>
-    <el-table-column
-      label="用户ID"
-      width="120">
-      <template slot-scope="scope">
-         <el-popover
-          ref="popover"
-          placement="right"
-          width="400"
-          trigger="click">
-          <el-card :body-style="{ padding: '0px' }">
-            <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
-            <div style="padding: 14px;">
-              <span style="float:left">{{transData.USERNAME}}</span>
-              <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
-              <br/>
-              <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
-              <span>{{userData.STATUE}}</span>
-              <br/>
-              <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
-              <span>{{userData.DEGREE}}</span>
-              <br/>
-              <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
-              <span>{{userData.PHONE}}</span>
-              <br/>
-              <svg-icon icon-class="icon_points" class="svg"></svg-icon>
-              <span>{{userData.POINTS}}</span>
-              <div class="bottom clearfix">
-                <time class="time">{{ userData.CREATED }}</time>
-              </div>
-            </div>
-          </el-card>
-        </el-popover>
-        <el-button v-popover:popover @click="handleHover(scope.row.USERID)">{{scope.row.USERID}}</el-button>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="TITLE"
-      label="正标题"
-      width="120">
-    </el-table-column>
-    <el-table-column
-      prop="STITLE"
-      label="副标题"
-      width="120">
-    </el-table-column>
-    <el-table-column
-      label="内容"
-      width="120">
-      <template slot-scope="scope">
-        <el-dialog title="内容详情" :visible.sync="dialogTableVisible">
-          <div v-html="scope.row.CONTENT"></div>
-        </el-dialog>
-        <el-button @click="handleContentMore()">查看内容</el-button>
-      </template>
-    </el-table-column>
-    <el-table-column
-      label="状态"
-      width="150">
-      <template slot-scope="scope"> 
-            <el-select v-model="scope.row.STATUE" placeholder="请选择" @change="handlerSelectChange(scope.row)">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="TYPE"
-      label="类型"
-      width="100">
-    </el-table-column>
-    <el-table-column
-      prop="CREATED"
-      label="创建时间"
-      width="120">
-    </el-table-column>
-    <!-- <el-table-column
-      fixed="right"
-      label="操作"
-      width="100">
-      <template slot-scope="scope">
-        <el-button @click="handleClick(scope.row)" type="text" size="small">查看内容</el-button>
-        <el-button type="text" size="small">编辑</el-button>
-      </template>
-    </el-table-column> -->
-  </el-table>
-  <pagination  v-on:handleChange="handleCurrentChange" :count="count"></pagination>
+    <div style="margin:10px;">
+      <el-table
+          :loading="loading"
+          :data="transArticle"
+          border fit
+          style="width: 100%">
+          <el-table-column
+            prop="ID"
+            label="ID"
+            min-width="150"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            label="用户ID"
+            width="120"
+            align="center">
+            <template slot-scope="scope">
+              <el-popover
+                ref="popover"
+                placement="right"
+                width="400"
+                trigger="click">
+                <el-card :body-style="{ padding: '0px' }">
+                  <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
+                  <div style="padding: 14px;">
+                    <span style="float:left">{{transData.USERNAME}}</span>
+                    <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
+                    <br/>
+                    <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
+                    <span>{{userData.STATUE}}</span>
+                    <br/>
+                    <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
+                    <span>{{userData.DEGREE}}</span>
+                    <br/>
+                    <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
+                    <span>{{userData.PHONE}}</span>
+                    <br/>
+                    <svg-icon icon-class="icon_points" class="svg"></svg-icon>
+                    <span>{{userData.POINTS}}</span>
+                    <div class="bottom clearfix">
+                      <time class="time">{{ userData.CREATED }}</time>
+                    </div>
+                  </div>
+                </el-card>
+              </el-popover>
+              <el-button v-popover:popover @click="handleHover(scope.row.USERID)">{{scope.row.USERID}}</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="TITLE"
+            label="正标题"
+            width="120"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            prop="STITLE"
+            label="副标题"
+            width="120"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            label="内容"
+            width="120"
+            align="center">
+            <template slot-scope="scope">
+              <el-dialog title="内容详情" :visible.sync="dialogTableVisible">
+                <div v-html="scope.row.CONTENT"></div>
+              </el-dialog>
+              <el-button @click="handleContentMore()">查看内容</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="状态"
+            width="150"
+            align="center">
+            <template slot-scope="scope"> 
+                  <el-select v-model="scope.row.STATUE" placeholder="请选择" @change="handlerSelectChange(scope.row)">
+                    <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="类型"
+            width="100"
+            align="center">
+             <template slot-scope="scope">
+              <el-tag :type="scope.row.TYPE | typeFilter">{{scope.row.TYPE}}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="CREATED"
+            label="创建时间"
+            width="120"
+            align="center">
+          </el-table-column>
+          <!-- <el-table-column
+            fixed="right"
+            label="操作"
+            width="100">
+            <template slot-scope="scope">
+              <el-button @click="handleClick(scope.row)" type="text" size="small">查看内容</el-button>
+              <el-button type="text" size="small">编辑</el-button>
+            </template>
+          </el-table-column> -->
+        </el-table>
+        <pagination  v-on:handleChange="handleCurrentChange" :count="count"></pagination>
+    </div>
+    
   </div>
 </template>
 
@@ -166,6 +179,15 @@ export default {
       if (sex === 0) { data.SEX = 'icon_man' } else { data.SEX = 'icon_woman' }
       if (statue === false) { data.STATUE = '正常' } else { data.STATUE = '小黑屋' }
       return data
+    }
+  },
+  filters: {
+    typeFilter(type) {
+      const statusMap = {
+        '原创': 'success',
+        '视频': 'info'
+      }
+      return statusMap[type]
     }
   },
   components: { getArticleByStatue, pagination, setArticleStatue, getUserById },

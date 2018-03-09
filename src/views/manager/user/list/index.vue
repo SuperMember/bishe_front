@@ -16,27 +16,33 @@
         </el-table-column>
         <el-table-column
           label="头像"
-          width="100">
+          width="100"
+          align="center">
           <template slot-scope="scope">
             <img style="width:50px;height:50px;" :src="scope.row.IMG"/>
           </template>
         </el-table-column>
         <el-table-column
-          prop="USERNAME"
           label="姓名"
-          width="150">
+          width="150"
+          align="center">
+          <template slot-scope="scope">
+              <el-tag type="info">{{scope.row.USERNAME}}</el-tag>
+            </template>
         </el-table-column>
         <el-table-column
           prop="SEX"
           label="性别"
-          width="100">
+          width="100"
+          align="center">
           <template slot-scope="scope">
             <svg-icon :icon-class="scope.row.SEX" style="width:30px;height:30px;"></svg-icon>
           </template>
         </el-table-column>
         <el-table-column
           label="状态"
-          width="120">
+          width="120"
+          align="center">
           <template slot-scope="scope"> 
             <el-select v-model="scope.row.STATUE" placeholder="请选择" @change="handlerSelectChange(scope.row)">
               <el-option
@@ -49,29 +55,39 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="DEGREE"
           label="等级"
-          width="100">
+          width="100"
+          align="center">
+           <template slot-scope="scope">
+              <el-tag type="danger">{{scope.row.DEGREE}}</el-tag>
+            </template>
         </el-table-column>
         <el-table-column
-          prop="PHONE"
           label="注册号码"
           width="150">
+           <template slot-scope="scope">
+              <el-tag type="warning">{{scope.row.PHONE}}</el-tag>
+            </template>
         </el-table-column>
         <el-table-column
           prop="PASSWORD"
           label="密码"
-          width="200">
+          width="200"
+          align="center">
         </el-table-column>
         <el-table-column
-          prop="POINTS"
           label="积分"
-          width="100">
+          width="100"
+          align="center">
+          <template slot-scope="scope">
+              <el-tag type="info">{{scope.row.POINTS}}</el-tag>
+            </template>
         </el-table-column>
         <el-table-column
           prop="CREATED"
           label="创建时间"
-          width="150">
+          width="150"
+          align="center">
         </el-table-column>
       </el-table>
       <pagination v-on:handleChange="handleCurrentChange" :count="count"></pagination>

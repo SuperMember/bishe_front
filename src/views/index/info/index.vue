@@ -70,7 +70,7 @@
                       </div>
                       <div style="text-align: right; margin: 0;margin-top:10px;">
                         <el-button size="mini" type="text" @click="cancle">取消</el-button>
-                        <el-button type="primary" size="mini" @click="comfirm">确定</el-button>
+                        <el-button type="primary" size="mini" @click="comfirm('ruleForm')">确定</el-button>
                       </div>
                     </el-popover>
                     <svg-icon icon-class="icon_phone" class="icon"></svg-icon>
@@ -142,11 +142,12 @@ export default {
           { validator: validatePhone, trigger: 'blur' }
         ],
         code: [
-          { min: 4, max: 4, message: '验证码格式不对', trigger: 'blur' }
+          { min: 4, max: 6, message: '验证码格式不对', trigger: 'blur' }
         ]
       }
     }
   },
+
   computed: {
     ...mapGetters(['info', 'roles'])
   },
@@ -203,17 +204,23 @@ export default {
         }
       })
     },
-    comfirm() {
+    comfirm(formName) {
       // 保存号码
-      checkCode(this.phone, this.code).then(response => {
-        // 验证是否成功
-        if (response.code === 50000) {
-          this.$message({
-            type: 'info',
-            message: '验证码错误!'
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          checkCode(this.phone, this.code).then(response => {
+            // 验证是否成功
+            if (response.code === 50000) {
+              this.$message({
+                type: 'info',
+                message: '验证码错误!'
+              })
+            } else {
+              // 保存操作
+            }
           })
         } else {
-          // 保存操作
+          return false
         }
       })
     },

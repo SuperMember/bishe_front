@@ -14,182 +14,197 @@
       <el-radio-button label="0">正常</el-radio-button>
       <el-radio-button label="1">已删除</el-radio-button>
     </el-radio-group>
-    <el-table
-    :data="transUserData"
-    border
-    @expand-change="handlerExpandChange"
-    >
+    <div style="margin:10px;">
+      <el-table
+          :data="transUserData"
+          border fit
+          @expand-change="handlerExpandChange"
+          >
+          <el-table-column
+            type="expand">
+            <template >
+                <el-popover
+                  ref="popover"
+                  placement="right"
+                  width="400"
+                  trigger="click">
+                  <el-card :body-style="{ padding: '0px' }">
+                    <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
+                    <div style="padding: 14px;">
+                      <span style="float:left">{{transData.USERNAME}}</span>
+                      <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
+                      <br/>
+                      <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
+                      <span>{{userData.STATUE}}</span>
+                      <br/>
+                      <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
+                      <span>{{userData.DEGREE}}</span>
+                      <br/>
+                      <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
+                      <span>{{userData.PHONE}}</span>
+                      <br/>
+                      <svg-icon icon-class="icon_points" class="svg"></svg-icon>
+                      <span>{{userData.POINTS}}</span>
+                      <div class="bottom clearfix">
+                        <time class="time">{{ userData.CREATED }}</time>
+                      </div>
+                    </div>
+                  </el-card>
+                </el-popover>
+              <!-- <el-table :data="replyData">
+                <el-table-column property="ID" label="ID" width="150"></el-table-column>
+                <el-table-column property="USER_ID" label="用户ID" width="80"></el-table-column>
+                <el-table-column property="CONTENT" label="回复内容"></el-table-column>
+                <el-table-column property="COMMENT_ID" label="回复ID" width="80"></el-table-column>
+                <el-table-column property="TOUSER_ID" label="被回复ID"  width="100"></el-table-column>
+                <el-table-column property="URL" label="图片链接"></el-table-column>
+                <el-table-column property="CREATED" label="回复时间" width="150"></el-table-column>
+              </el-table> -->
+              <el-row>
+                <el-col :span="10" v-for="(o) in replyData" :key="o" style="margin-right:10px;margin-bottom:10px;">
+                  <el-card :body-style="{ padding: '0px' }">
+                    <img :src="o.IMG" class="image">
+                    <span class="name">{{o.USERNAME}}</span>
+                    <!-- <span class="name">{{o.USERNAME}}</span> -->
+                    <span style="float:right;margin-right:15px;margin-top:10px">{{o.COUNT}}</span>
+                    <svg-icon icon-class="icon_zan" style="width:20px;height:20px;margin-top:10px;margin-right:10px;float:right"></svg-icon>
+                    <div style="padding: 14px;" class="content">
+                      <span>{{o.CONTENT}}</span>
+                      <br/>
+                      <img :src="o.URL"  style="height:100px;" v-if="o.URL!=null"/>
+                      <div class="bottom clearfix">
+                        <time class="time">{{ o.CREATED }}</time>
+                        <el-button type="text" class="button" @click="handleReplyDelete(o.ID)">删除</el-button>
+                      </div>
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+              <pagination  v-on:handleChange="handleReplyCurrentChange" :count="replyCount"></pagination>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="ID"
+            label="ID"
+            min-width="150" 
+            >
+          </el-table-column>
+          <el-table-column
+            prop="CONTENT"
+            label="内容"
+            width="120">
+            <template slot-scope="scope">
+            <el-dialog title="内容详情" :visible.sync="dialogMoreVisible">
+              <div v-html="scope.row.CONTENT"></div>
+            </el-dialog>
+            <el-button @click="handleContentMore()">查看内容</el-button>
+          </template>
+          </el-table-column>
+          <el-table-column
+            align="center"
+            label="被评论用户ID"
+            width="120">
+            <template slot-scope="scope">
+              <el-popover
+                ref="popover"
+                placement="right"
+                width="400"
+                trigger="click">
+                <el-card :body-style="{ padding: '0px' }">
+                  <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
+                  <div style="padding: 14px;">
+                    <span style="float:left">{{transData.USERNAME}}</span>
+                    <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
+                    <br/>
+                    <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
+                    <span>{{userData.STATUE}}</span>
+                    <br/>
+                    <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
+                    <span>{{userData.DEGREE}}</span>
+                    <br/>
+                    <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
+                    <span>{{userData.PHONE}}</span>
+                    <br/>
+                    <svg-icon icon-class="icon_points" class="svg"></svg-icon>
+                    <span>{{userData.POINTS}}</span>
+                    <div class="bottom clearfix">
+                      <time class="time">{{ userData.CREATED }}</time>
+                    </div>
+                  </div>
+                </el-card>
+              </el-popover>
+              <el-button v-popover:popover @click="handleHover(scope.row.BELONG_ID)">{{scope.row.BELONG_ID}}</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column
+            align="center"
+            label="评论用户ID"
+            width="120">
+            <template slot-scope="scope">
+              <el-popover
+                ref="popover"
+                placement="right"
+                width="400"
+                trigger="click">
+                <el-card :body-style="{ padding: '0px' }">
+                  <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
+                  <div style="padding: 14px;">
+                    <span style="float:left">{{transData.USERNAME}}</span>
+                    <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
+                    <br/>
+                    <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
+                    <span>{{userData.STATUE}}</span>
+                    <br/>
+                    <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
+                    <span>{{userData.DEGREE}}</span>
+                    <br/>
+                    <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
+                    <span>{{userData.PHONE}}</span>
+                    <br/>
+                    <svg-icon icon-class="icon_points" class="svg"></svg-icon>
+                    <span>{{userData.POINTS}}</span>
+                    <div class="bottom clearfix">
+                      <time class="time">{{ userData.CREATED }}</time>
+                    </div>
+                  </div>
+                </el-card>
+              </el-popover>
+              <el-button v-popover:popover @click="handleHover(scope.row.USER_ID)">{{scope.row.USER_ID}}</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="评论类型"
+            width="120"
+            align="center">
+            <template slot-scope="scope">
+              <el-tag :type="scope.row.TYPE | typeFilter">{{scope.row.TYPE}}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
+            align="center"
+            label="图片"
+            width="100">
+            <template slot-scope="scope">
+              <img :src="scope.row.URL" style="width:50px;height:50px;" v-if="scope.row.URL!=''"/>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="COUNT"
+            label="点赞数量"
+            width="120"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            align="center"
+            label="操作"
+            width="80">
+            <template slot-scope="scope">
+               <el-button  size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+    </div>
     
-    <el-table-column
-      type="expand">
-       <template >
-          <el-popover
-            ref="popover"
-            placement="right"
-            width="400"
-            trigger="click">
-            <el-card :body-style="{ padding: '0px' }">
-              <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
-              <div style="padding: 14px;">
-                <span style="float:left">{{transData.USERNAME}}</span>
-                <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
-                <br/>
-                <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
-                <span>{{userData.STATUE}}</span>
-                <br/>
-                <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
-                <span>{{userData.DEGREE}}</span>
-                <br/>
-                <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
-                <span>{{userData.PHONE}}</span>
-                <br/>
-                <svg-icon icon-class="icon_points" class="svg"></svg-icon>
-                <span>{{userData.POINTS}}</span>
-                <div class="bottom clearfix">
-                  <time class="time">{{ userData.CREATED }}</time>
-                </div>
-              </div>
-            </el-card>
-          </el-popover>
-        <!-- <el-table :data="replyData">
-          <el-table-column property="ID" label="ID" width="150"></el-table-column>
-          <el-table-column property="USER_ID" label="用户ID" width="80"></el-table-column>
-          <el-table-column property="CONTENT" label="回复内容"></el-table-column>
-          <el-table-column property="COMMENT_ID" label="回复ID" width="80"></el-table-column>
-          <el-table-column property="TOUSER_ID" label="被回复ID"  width="100"></el-table-column>
-          <el-table-column property="URL" label="图片链接"></el-table-column>
-          <el-table-column property="CREATED" label="回复时间" width="150"></el-table-column>
-        </el-table> -->
-        <el-row>
-          <el-col :span="10" v-for="(o) in replyData" :key="o" style="margin-right:10px;margin-bottom:10px;">
-            <el-card :body-style="{ padding: '0px' }">
-              <img :src="o.IMG" class="image">
-              <span class="name">{{o.USERNAME}}</span>
-              <!-- <span class="name">{{o.USERNAME}}</span> -->
-              <span style="float:right;margin-right:15px;margin-top:10px">{{o.COUNT}}</span>
-              <svg-icon icon-class="icon_zan" style="width:20px;height:20px;margin-top:10px;margin-right:10px;float:right"></svg-icon>
-              <div style="padding: 14px;" class="content">
-                <span>{{o.CONTENT}}</span>
-                <br/>
-                <img :src="o.URL"  style="height:100px;" v-if="o.URL!=null"/>
-                <div class="bottom clearfix">
-                  <time class="time">{{ o.CREATED }}</time>
-                  <el-button type="text" class="button" @click="handleReplyDelete(o.ID)">删除</el-button>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        <pagination  v-on:handleChange="handleReplyCurrentChange" :count="replyCount"></pagination>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="ID"
-      label="ID"
-      width="150" 
-      >
-    </el-table-column>
-    <el-table-column
-      prop="CONTENT"
-      label="内容"
-      width="120">
-    </el-table-column>
-    <el-table-column
-      label="被评论用户ID"
-      width="120">
-      <template slot-scope="scope">
-        <el-popover
-          ref="popover"
-          placement="right"
-          width="400"
-          trigger="click">
-          <el-card :body-style="{ padding: '0px' }">
-            <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
-            <div style="padding: 14px;">
-              <span style="float:left">{{transData.USERNAME}}</span>
-              <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
-              <br/>
-              <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
-              <span>{{userData.STATUE}}</span>
-              <br/>
-              <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
-              <span>{{userData.DEGREE}}</span>
-              <br/>
-              <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
-              <span>{{userData.PHONE}}</span>
-              <br/>
-              <svg-icon icon-class="icon_points" class="svg"></svg-icon>
-              <span>{{userData.POINTS}}</span>
-              <div class="bottom clearfix">
-                <time class="time">{{ userData.CREATED }}</time>
-              </div>
-            </div>
-          </el-card>
-        </el-popover>
-        <el-button v-popover:popover @click="handleHover(scope.row.BELONG_ID)">{{scope.row.BELONG_ID}}</el-button>
-      </template>
-    </el-table-column>
-    <el-table-column
-      label="评论用户ID"
-      width="120"
-      >
-      <template slot-scope="scope">
-         <el-popover
-          ref="popover"
-          placement="right"
-          width="400"
-          trigger="click">
-          <el-card :body-style="{ padding: '0px' }">
-            <img :src="userData.IMG"  height="100px" style="margin:10px;float:left;">
-            <div style="padding: 14px;">
-              <span style="float:left">{{transData.USERNAME}}</span>
-              <svg-icon :icon-class="transData.SEX" style="margin-left:10px;" class="svg"></svg-icon>
-              <br/>
-              <svg-icon icon-class="icon_statue" class="svg"></svg-icon>
-              <span>{{userData.STATUE}}</span>
-              <br/>
-              <svg-icon icon-class="icon_degree" class="svg"></svg-icon>
-              <span>{{userData.DEGREE}}</span>
-              <br/>
-              <svg-icon icon-class="icon_phone" class="svg"></svg-icon>
-              <span>{{userData.PHONE}}</span>
-              <br/>
-              <svg-icon icon-class="icon_points" class="svg"></svg-icon>
-              <span>{{userData.POINTS}}</span>
-              <div class="bottom clearfix">
-                <time class="time">{{ userData.CREATED }}</time>
-              </div>
-            </div>
-          </el-card>
-        </el-popover>
-        <el-button v-popover:popover @click="handleHover(scope.row.USER_ID)">{{scope.row.USER_ID}}</el-button>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="TYPE"
-      label="评论类型"
-      width="120">
-    </el-table-column>
-    <el-table-column
-      label="图片"
-      width="100">
-      <template slot-scope="scope">
-        <img :src="scope.row.URL" style="width:50px;height:50px;" v-if="scope.row.URL!=''"/>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="COUNT"
-      label="点赞数量"
-      width="120">
-    </el-table-column>
-    <el-table-column
-      label="操作"
-      width="50">
-      <template slot-scope="scope">
-        <el-button @click="handleDelete(scope.row)" type="text" size="small">删除</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
   <pagination  v-on:handleChange="handleCurrentChange" :count="count"></pagination>
   
   </div>
@@ -211,7 +226,8 @@ export default {
       replyData: [],
       replyCount: 0,
       expand: true,
-      userData: {}
+      userData: {},
+      dialogMoreVisible: false
     }
   },
   computed: {
@@ -237,6 +253,16 @@ export default {
       if (sex === 0) { data.SEX = 'icon_man' } else { data.SEX = 'icon_woman' }
       if (statue === false) { data.STATUE = '正常' } else { data.STATUE = '小黑屋' }
       return data
+    }
+  },
+  filters: {
+    typeFilter(type) {
+      const statusMap = {
+        '帖子': 'success',
+        '新闻': 'info',
+        '作家': 'warning'
+      }
+      return statusMap[type]
     }
   },
   components: {
@@ -317,6 +343,9 @@ export default {
       getUserById(id).then(response => {
         this.userData = response.data
       })
+    },
+    handleContentMore() {
+      this.dialogMoreVisible = true
     }
   }
 }
@@ -329,9 +358,7 @@ export default {
 .el-radio-group{
   margin: 10px;
 }
-.el-table{
-  margin: 10px;
-}
+
 .type{
   margin-left: 10px;
 }
