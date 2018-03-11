@@ -49,7 +49,6 @@ export function deleteArticle(articleId) {
 
 // 修改文章内容
 export function updateArticle(form) {
-  console.log(form)
   return request({
     url: '/admin/manager/article',
     method: 'put',
@@ -59,5 +58,13 @@ export function updateArticle(form) {
       content: form.CONTENT,
       articleId: form.ID
     }
+  })
+}
+
+// 根据文章id获取文章相关数据
+export function getArticleById(id) {
+  return request({
+    url: '/manager/article/list/' + id,
+    method: 'get'
   })
 }

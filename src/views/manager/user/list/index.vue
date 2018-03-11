@@ -6,13 +6,16 @@
       <el-radio-button label="1">小黑屋</el-radio-button>
     </el-radio-group>
     <el-table
+        border
         :loading="loading"
         :data="transUserData"
         style="width: 100%">
         <el-table-column
           label="ID"
-          width="120"
-          prop="ID">
+          width="120">
+            <template slot-scope="scope">
+              <el-tag >{{scope.row.ID}}</el-tag>
+            </template>
         </el-table-column>
         <el-table-column
           label="头像"
@@ -84,10 +87,12 @@
             </template>
         </el-table-column>
         <el-table-column
-          prop="CREATED"
           label="创建时间"
           width="150"
           align="center">
+          <template slot-scope="scope">
+              <el-tag type="danger">{{scope.row.CREATED}}</el-tag>
+            </template>
         </el-table-column>
       </el-table>
       <pagination v-on:handleChange="handleCurrentChange" :count="count"></pagination>

@@ -87,27 +87,6 @@ export const constantRouterMap = [
   },
 
   {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
-    children: [
-      {
-        path: 'table',
-        name: 'Table',
-        component: _import('table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'data',
-        name: 'Data',
-        component: _import('data/index'),
-        meta: { title: 'Data', icon: 'data' }
-      }
-    ]
-  },
-  {
     path: '/comments',
     component: Layout,
     redirect: '/comments/receive',
@@ -118,7 +97,13 @@ export const constantRouterMap = [
         path: 'receive',
         name: 'Receive',
         component: _import('comments/receive/index'),
-        meta: { title: '评论', icon: 'form' }
+        meta: { title: '我的评论', icon: 'form' }
+      },
+      {
+        path: 'replied',
+        name: 'Replied',
+        component: _import('comments/replied/index'),
+        meta: { title: '我的回复', icon: 'form' }
       }
     ]
   },

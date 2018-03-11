@@ -74,7 +74,7 @@
                       <img :src="o.URL"  style="height:100px;" v-if="o.URL!=null"/>
                       <div class="bottom clearfix">
                         <time class="time">{{ o.CREATED }}</time>
-                        <el-button type="text" class="button" @click="handleReplyDelete(o.ID)">删除</el-button>
+                        <el-button size="mini" type="danger" class="button" @click="handleReplyDelete(o.ID)">删除</el-button>
                       </div>
                     </div>
                   </el-card>
@@ -84,10 +84,12 @@
             </template>
           </el-table-column>
           <el-table-column
-            prop="ID"
             label="ID"
             min-width="150" 
             >
+            <template slot-scope="scope">
+              <el-tag >{{scope.row.ID}}</el-tag>
+            </template>
           </el-table-column>
           <el-table-column
             prop="CONTENT"
@@ -189,10 +191,12 @@
             </template>
           </el-table-column>
           <el-table-column
-            prop="COUNT"
             label="点赞数量"
             width="120"
             align="center">
+             <template slot-scope="scope">
+              <el-tag type="danger">{{scope.row.COUNT}}</el-tag>
+            </template>
           </el-table-column>
           <el-table-column
             align="center"

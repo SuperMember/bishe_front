@@ -14,10 +14,11 @@
           border fit
           style="width: 100%">
           <el-table-column
-            prop="ID"
             label="ID"
-            min-width="150"
-            align="center">
+            min-width="150">
+            <template slot-scope="scope">
+              <el-tag >{{scope.row.ID}}</el-tag>
+            </template>
           </el-table-column>
           <el-table-column
             label="用户ID"
@@ -102,10 +103,12 @@
             </template>
           </el-table-column>
           <el-table-column
-            prop="CREATED"
             label="创建时间"
             width="120"
             align="center">
+            <template slot-scope="scope">
+              <el-tag type="danger">{{scope.row.CREATED}}</el-tag>
+            </template>
           </el-table-column>
           <!-- <el-table-column
             fixed="right"
