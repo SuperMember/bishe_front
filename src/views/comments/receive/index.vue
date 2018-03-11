@@ -1,7 +1,7 @@
 <template>
   <div style="margin:10px;">
     <div style="margin-bottom:10px;">
-      <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">搜索</el-button>
+      <el-button class="filter-item" type="primary"  icon="el-icon-search" @click="handleFilter">搜索</el-button>
     </div>
     <el-table
         :data="transTableData"
@@ -106,14 +106,14 @@
                     </el-form-item>
                      <el-form-item>
                       <el-button @click="dialogReplyVisible=false">取消</el-button>
-                      <el-button type="primary" @click="onSubmit">回复</el-button>
+                      <el-button type="primary" @click="onSubmit()">回复</el-button>
                     </el-form-item>
                 </el-form>
             </el-dialog>
             <el-dialog title="举报" :visible.sync="dialogReportVisible">
-                <el-form ref="reply" :model="form" label-width="80px">
+                <el-form ref="report" :model="report" label-width="80px">
                     <el-form-item label="举报内容">
-                      <el-radio-group v-model="radio" @change="radioChange">
+                      <el-radio-group v-model="report.radio" @change="radioChange">
                         <el-radio label="0">色情</el-radio>
                         <el-radio label="1">无端谩骂</el-radio>
                         <el-radio label="2">反动</el-radio>
@@ -122,11 +122,11 @@
                       </el-radio-group>
                     </el-form-item>
                     <el-form-item label="其他">
-                        <el-input type="textarea" :disabled="disabledOther"></el-input>
+                        <el-input type="textarea" v-model="report.content" :disabled="disabledOther"></el-input>
                     </el-form-item>
                      <el-form-item>
                       <el-button @click="dialogReportVisible=false">取消</el-button>
-                      <el-button type="primary" @click="handleReport">举报</el-button>
+                      <el-button type="primary" @click="handleReport(scope.row)">举报</el-button>
                     </el-form-item>
                 </el-form>
             </el-dialog>
@@ -139,13 +139,13 @@
         <el-dialog title="内容详情" :visible.sync="dialogMoreVisible" @open="open">
           <el-form ref="form" :model="transFormData" label-width="80px">
             <el-form-item label="大标题">
-              <el-input v-model="transFormData.TITLE" disabled="true"></el-input>
+              <el-input v-model="transFormData.TITLE" disabled></el-input>
             </el-form-item>
             <el-form-item label="小标题">
-              <el-input v-model="transFormData.STITLE" disabled="true"></el-input>
+              <el-input v-model="transFormData.STITLE" disabled></el-input>
             </el-form-item>
             <el-form-item label="正文内容">
-              <el-input type="textarea" v-model="transFormData.CONTENT" disabled="true"></el-input>
+              <el-input type="textarea" v-model="transFormData.CONTENT" disabled></el-input>
             </el-form-item>
              <el-form-item label="文章类型">
               <el-tag type="success">{{transFormData.TYPE}}</el-tag>
@@ -193,7 +193,10 @@ export default {
       currentId: null,
       dialogReportVisible: false,
       radio: '0',
-      disabledOther: false
+      disabledOther: true,
+      report: {
+        radio: '0'
+      }
     }
   },
   filters: {
@@ -298,16 +301,15 @@ export default {
     handleDelete(row) {
       // 举报评论
       this.dialogReportVisible = true
-      this.report = row
     },
-    handleReport() {
+    handleReport(row) {
       this.$confirm('是否举报该评论?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        report().then(response => {
-          if (response === 20000) {
+        report(this.report.content != null ? this.report.content : this.report.radio, 0, row.USER_ID, '').then(response => {
+          if (response.code === 20000) {
             this.$message({
               type: 'info',
               message: '举报成功'
@@ -353,9 +355,13 @@ export default {
       this.createdImgUrl = createImgUrl
     },
     // 图片上传结束
-
+    handleFilter() {
+      // 搜索
+    },
     radioChange(index) {
-      if (index === 4) {
+      if (index === '4') {
+        this.disabledOther = false
+      } else {
         this.disabledOther = true
       }
     }
