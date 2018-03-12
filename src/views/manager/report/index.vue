@@ -22,7 +22,8 @@
     <el-table-column
       prop="CONTENT"
       label="举报内容"
-      width="120">
+      width="120"
+      align="center">
     </el-table-column>
     <el-table-column
       label="举报人"
@@ -99,7 +100,7 @@
     <el-table-column
       prop="URL"
       label="图片url"
-      width="200">
+      width="150">
     </el-table-column>
     <el-table-column
       prop="TYPE"
@@ -121,12 +122,57 @@
     <el-table-column
       label="操作"
       align="center"
-      width="100">
+      width="180">
       <template slot-scope="scope">
-        <el-button type="primary" size="mini" >审批</el-button>
+        <el-button type="primary" size="mini" @click="handleCheck(scope.row)">审批</el-button>
+        <el-button type="success" size="mini" @click="handleMore(scope.row)">查看详情</el-button>
       </template>
     </el-table-column>
   </el-table>
+  <el-dialog title="文章详情" :visible.sync="dialogMoreArticleVisible">
+          <el-form ref="articleForm" :model="transFormData" label-width="80px">
+            <el-form-item label="大标题">
+              <el-input v-model="transFormData.TITLE" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="小标题">
+              <el-input v-model="transFormData.STITLE" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="正文内容">
+              <el-input type="textarea" v-model="transFormData.CONTENT" disabled></el-input>
+            </el-form-item>
+             <el-form-item label="文章类型">
+              <el-tag type="success">{{transFormData.TYPE}}</el-tag>
+            </el-form-item>
+            <el-form-item label="文章状态">
+              <el-tag>{{transFormData.STATUE}}</el-tag>
+            </el-form-item>
+            <el-form-item label="发布时间">
+              <el-tag type="danger">{{transFormData.CREATED}}</el-tag>
+            </el-form-item>
+          </el-form>
+        </el-dialog>
+  <el-dialog title="评论详情" :visible.sync="dialogMoreCommentVisible">
+          <el-form ref="commentForm" :model="transComment" label-width="80px">
+                <el-form-item label="内容">
+                  <el-input v-model="transComment.CONTENT" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="评论状态">
+                  <el-tag type="warning">{{transComment.STATUE}}</el-tag>
+                </el-form-item>
+                <el-form-item label="图片" v-if="transComment.URL!=null">
+                  <img v-if="transComment.URL!=null" :src="transComment.URL" style="height:100px;"/>
+                </el-form-item>
+                <el-form-item label="类型">
+                  <el-tag type="success">{{transComment.TYPE}}</el-tag>
+                </el-form-item>
+                <el-form-item label="点赞数量">
+                  <el-tag>{{transComment.COUNT}}</el-tag>
+                </el-form-item>
+                <el-form-item label="发布时间">
+                  <el-tag type="danger">{{transComment.CREATED}}</el-tag>
+                </el-form-item>
+          </el-form>
+  </el-dialog>
   <pagination v-on:handleChange="handleCurrentChange" :count="count"></pagination>
 </div>
   
@@ -134,7 +180,7 @@
 
 <script>
 import pagination from '../../../components/pagination'
-import { getReport } from '@/api/report'
+import { getReport, getReportByType, setReportStatue } from '@/api/report'
 import { getUserById } from '@/api/user'
 export default {
   data() {
@@ -144,10 +190,52 @@ export default {
       radio: '3',
       page: 1,
       type: '3',
-      userData: {}
+      userData: {},
+      dialogMoreCommentVisible: false,
+      dialogMoreArticleVisible: false,
+      commentForm: {},
+      articleForm: {}
     }
   },
   computed: {
+    transComment() {
+      var data = this.commentForm
+      var statue = data.STATUE
+      var type = data.TYPE
+      if (statue === 0) {
+        data.STATUE = '正常'
+      } else {
+        data.STATUE = '已删除'
+      }
+      if (type === 0) {
+        data.TYPE = '帖子'
+      } else if (type === 1) {
+        data.TYPE = '新闻'
+      } else {
+        data.TYPE = '作家'
+      }
+      return data
+    },
+    transFormData() {
+      var data = this.articleForm
+      var type = data.TYPE
+      var statue = data.STATUE
+      if (type === 0) {
+        data.TYPE = '原创'
+      } else {
+        data.TYPE = '视频'
+      }
+      if (statue === 0) {
+        data.STATUE = '保存'
+      } else if (statue === 1) {
+        data.STATUE = '审核中'
+      } else if (statue === 2) {
+        data.STATUE = '未通过'
+      } else {
+        data.STATUE = '审核通过'
+      }
+      return data
+    },
     transTableData() {
       var data = this.tableData
       data.forEach(function(item, i) {
@@ -157,6 +245,16 @@ export default {
           data[i].TYPE = '文章'
         } else {
           data[i].TYPE = '图片'
+        }
+
+        if (item.CONTENT === '0') {
+          data[i].CONTENT = '色情'
+        } else if (item.CONTENT === '1') {
+          data[i].CONTENT = '无端谩骂'
+        } else if (item.CONTENT === '2') {
+          data[i].CONTENT = '反动'
+        } else {
+          data[i].CONTENT = '不正当言论'
         }
       }, this)
       return data
@@ -170,7 +268,7 @@ export default {
       return data
     }
   },
-  components: { pagination, getReport, getUserById },
+  components: { pagination, getReport, getUserById, getReportByType, setReportStatue },
   created() {
     this.getReports(this.page, this.type)
   },
@@ -214,6 +312,34 @@ export default {
       getUserById(id).then(response => {
         this.userData = response.data
       })
+    },
+    handleMore(row) {
+      if (row.TYPE === '评论') {
+        this.dialogMoreCommentVisible = true
+      } else {
+        this.dialogMoreArticleVisible = true
+      }
+      // 加载数据
+      var type = ''
+      if (row.TYPE === '评论') {
+        type = '0'
+      } else if (row.TYPE === '文章') {
+        type = '1'
+      } else {
+        type = '2'
+      }
+      getReportByType(type, row.BELONG_ID).then(response => {
+        if (response.code === 20000) {
+          if (type === '0') {
+            this.commentForm = response.data
+          } else {
+            this.articleForm = response.data
+          }
+        }
+      })
+    },
+    handleCheck(row) {
+      // 审批
     }
   }
 }

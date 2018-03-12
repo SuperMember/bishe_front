@@ -308,7 +308,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        report(this.report.content != null ? this.report.content : this.report.radio, 0, row.USER_ID, '').then(response => {
+        report(this.report.content != null ? this.report.content : this.report.radio, 0, row.USER_ID, '', row.ID).then(response => {
           if (response.code === 20000) {
             this.$message({
               type: 'info',
