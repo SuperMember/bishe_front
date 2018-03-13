@@ -92,15 +92,14 @@
             </template>
           </el-table-column>
           <el-table-column
-            prop="CONTENT"
             label="内容"
             width="120">
             <template slot-scope="scope">
-            <el-dialog title="内容详情" :visible.sync="dialogMoreVisible">
-              <div v-html="scope.row.CONTENT"></div>
-            </el-dialog>
-            <el-button @click="handleContentMore()">查看内容</el-button>
-          </template>
+              <el-dialog title="内容详情" :visible.sync="dialogMoreVisible">
+                <div v-html="content"></div>
+              </el-dialog>
+              <el-button @click="handleContentMore(scope.row.CONTENT)">查看内容</el-button>
+            </template>
           </el-table-column>
           <el-table-column
             align="center"
@@ -203,7 +202,7 @@
             label="操作"
             width="80">
             <template slot-scope="scope">
-               <el-button  size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+               <el-button v-if="scope.row.STATUE!=1" size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -231,7 +230,8 @@ export default {
       replyCount: 0,
       expand: true,
       userData: {},
-      dialogMoreVisible: false
+      dialogMoreVisible: false,
+      content: ''
     }
   },
   computed: {
@@ -348,8 +348,9 @@ export default {
         this.userData = response.data
       })
     },
-    handleContentMore() {
+    handleContentMore(content) {
       this.dialogMoreVisible = true
+      this.content = content
     }
   }
 }

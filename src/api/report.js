@@ -16,22 +16,25 @@ export function report(content, type, ruserId, url, belongId) {
 }
 
 // 修改举报状态
-export function setReportStatue(statue, id) {
+export function setReportStatue(statue, type, id, belongId, userId) {
   return request({
     url: '/manager/report/list',
     method: 'put',
     data: {
       statue: statue,
-      id: id
+      id: id,
+      type: type,
+      userId: userId,
+      belongId: belongId
     }
 
   })
 }
 
 // 获取举报的数据
-export function getReport(page, type) {
+export function getReport(page, type, result) {
   return request({
-    url: '/manager/report/list?page=' + page + '&type=' + type,
+    url: '/manager/report/list?page=' + page + '&type=' + type + '&result=' + result,
     method: 'get'
   })
 }

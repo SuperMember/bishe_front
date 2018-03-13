@@ -6,7 +6,7 @@
           <el-radio-button label="0">原创</el-radio-button>
           <el-radio-button label="1">视频</el-radio-button>
         </el-radio-group>
-        <el-form ref="formData" :model="form" label-width="80px" >
+        <el-form ref="formData" :model="form" label-width="80px" :rules="rules">
           <el-form-item label="大标题" prop="bigtitle">
             <el-input v-model="form.bigtitle" placeholder="请输入大标题" ></el-input>
           </el-form-item>
@@ -32,7 +32,17 @@ export default {
   data() {
     return {
       type: 0,
-      form: {}
+      form: {},
+      rules: {
+        bigtitle: [
+          { required: true, message: '请输入大标题', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        smalltitle: [
+          { required: true, message: '请输入小标题', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ]
+      }
     }
   },
   components: {
@@ -44,7 +54,13 @@ export default {
   methods: {
 
     onSubmit: function(flag) {
-      this.upData(flag)
+      this.$refs['formData'].validate((valid) => {
+        if (valid) {
+          this.upData(flag)
+        } else {
+          return false
+        }
+      })
     },
     // 清空内容
     onCancel: function(refName) {
@@ -52,7 +68,13 @@ export default {
     },
     onSave: function(flag) {
     // 保存数据
-      this.upData(flag)
+      this.$refs['formData'].validate((valid) => {
+        if (valid) {
+          this.upData(flag)
+        } else {
+          return false
+        }
+      })
     },
     upData(flag) {
       // 提交数据
@@ -76,7 +98,8 @@ export default {
           message: type + '失败,请稍后重试'
         })
       })
-    }
+    },
+    handlerTypeChange(type) {}
   }
 }
 </script>

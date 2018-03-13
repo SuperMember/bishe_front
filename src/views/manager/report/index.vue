@@ -7,6 +7,16 @@
           <el-radio-button label="1">文章</el-radio-button>
           <el-radio-button label="2">图片</el-radio-button>
     </el-radio-group>
+  <br/>
+  <div style="margin-top:10px;">
+    <label>举报结果:</label>
+      <el-radio-group v-model="result" @change="resultChange">
+            <el-radio-button label="3">全部</el-radio-button>
+            <el-radio-button label="0">处理中</el-radio-button>
+            <el-radio-button label="1">举报成功</el-radio-button>
+            <el-radio-button label="2">举报失败</el-radio-button>
+      </el-radio-group>
+  </div>
 <el-table
     stripe
     :data="transTableData"
@@ -120,15 +130,40 @@
         </template>
     </el-table-column>
     <el-table-column
+      label="举报状态"
+      width="130"
+      align="center">
+        <template slot-scope="scope">
+              <el-tag type="danger">{{scope.row.RESULT}}</el-tag>
+        </template>
+    </el-table-column>
+    <el-table-column
       label="操作"
       align="center"
       width="180">
       <template slot-scope="scope">
-        <el-button type="primary" size="mini" @click="handleCheck(scope.row)">审批</el-button>
+        <el-dialog title="审核" :visible.sync="dialogCheckVisible" >
+          <div>
+              <el-form ref="checkForm" :model="checkForm" label-width="80px">
+                  <el-form-item label="结果">
+                    <el-radio-group v-model="checkForm.result">
+                          <el-radio label="1">举报成功</el-radio>
+                          <el-radio label="2">举报失败</el-radio>
+                    </el-radio-group>
+                  </el-form-item>
+                  <el-form-item>
+                    <el-button type="success" size="mini" @click="dialogCheckVisible=false">取消</el-button>
+                    <el-button type="primary" size="mini" @click="handleCheckSuccess(scope.row)">确定</el-button>
+                  </el-form-item>
+              </el-form>
+          </div>
+        </el-dialog>
+        <el-button type="primary" v-if="scope.row.RESULT==='处理中'" size="mini" @click="handleCheck(scope.row)">审批</el-button>
         <el-button type="success" size="mini" @click="handleMore(scope.row)">查看详情</el-button>
       </template>
     </el-table-column>
   </el-table>
+  
   <el-dialog title="文章详情" :visible.sync="dialogMoreArticleVisible">
           <el-form ref="articleForm" :model="transFormData" label-width="80px">
             <el-form-item label="大标题">
@@ -193,8 +228,13 @@ export default {
       userData: {},
       dialogMoreCommentVisible: false,
       dialogMoreArticleVisible: false,
+      dialogCheckVisible: false,
       commentForm: {},
-      articleForm: {}
+      articleForm: {},
+      checkForm: {
+        result: '1'
+      },
+      result: '3'
     }
   },
   computed: {
@@ -212,7 +252,7 @@ export default {
       } else if (type === 1) {
         data.TYPE = '新闻'
       } else {
-        data.TYPE = '作家'
+        data.TYPE = '文章'
       }
       return data
     },
@@ -256,6 +296,14 @@ export default {
         } else {
           data[i].CONTENT = '不正当言论'
         }
+
+        if (item.RESULT === 0) {
+          data[i].RESULT = '处理中'
+        } else if (item.RESULT === 1) {
+          data[i].RESULT = '举报成功'
+        } else {
+          data[i].RESULT = '举报失败'
+        }
       }, this)
       return data
     },
@@ -270,7 +318,7 @@ export default {
   },
   components: { pagination, getReport, getUserById, getReportByType, setReportStatue },
   created() {
-    this.getReports(this.page, this.type)
+    this.getReports(this.page, this.type, this.result)
   },
   filters: {
     typeFilter(type) {
@@ -283,8 +331,8 @@ export default {
     }
   },
   methods: {
-    getReports(page, type) {
-      getReport(page, type).then(response => {
+    getReports(page, type, result) {
+      getReport(page, type, result).then(response => {
         if (response.code === 20000) {
           this.$message({
             type: 'info',
@@ -302,11 +350,11 @@ export default {
     },
     handleCurrentChange(page) {
       this.page = page
-      this.getReports(page, this.type)
+      this.getReports(page, this.type, this.result)
     },
     radioChange(type) {
       this.type = type
-      this.getReports(this.page, this.type)
+      this.getReports(this.page, this.type, this.result)
     },
     handleHover(id) {
       getUserById(id).then(response => {
@@ -340,6 +388,37 @@ export default {
     },
     handleCheck(row) {
       // 审批
+      this.dialogCheckVisible = true
+    },
+    handleCheckSuccess(row) {
+      // 审核确定
+      var type = 0
+      if (row.TYPE === '评论') {
+        type = 0
+      } else if (row.TYPE === '文章') {
+        type = 1
+      } else {
+        type = 2
+      }
+      setReportStatue(parseInt(this.checkForm.result), type, row.ID, row.BELONG_ID, row.RUSER_ID).then(response => {
+        if (response.code === 20000) {
+          this.$message({
+            type: 'success',
+            message: '审核成功'
+          })
+          this.getReports(this.page, this.type)
+        } else {
+          this.$message({
+            type: 'info',
+            message: '审核失败'
+          })
+        }
+        this.dialogCheckVisible = false
+      })
+    },
+    resultChange(result) {
+      this.result = result
+      this.getReports(this.page, this.type, this.result)
     }
   }
 }

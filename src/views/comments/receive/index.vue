@@ -18,6 +18,7 @@
         <el-table-column
           label="评论内容"
           width="100"
+          align="center"
           >
           <template slot-scope="scope">
             <el-dialog title="评论内容" :visible.sync="dialogTableVisible" width="300px">
@@ -27,7 +28,7 @@
                 <img height="100px" v-if="scope.row.URL!=null" :src="scope.row.URL"/>
               </div>
             </el-dialog>
-            <el-button @click="handleContentMore()">详情</el-button>
+            <el-button type="primary" size="mini" @click="handleContentMore()" >详情</el-button>
           </template>
         </el-table-column>
         <el-table-column
@@ -101,12 +102,14 @@
                       <el-input type="textarea" v-model="reply.desc"></el-input>
                     </el-form-item>
                     <el-form-item label="添加图片">
-                       <el-button type="primary" icon="upload"  @click="imagecropperShow=true" size="" class="edit">图片
-                       </el-button>
+                      <el-input type="hidden" v-model="reply.url"></el-input>
+                       <div class="editor-container">
+                          <dropzone v-on:dropzone-removedFile="dropzoneR" v-on:dropzone-success="dropzoneS" id="myVueDropzone" url="http://localhost:9090/file/upload"></dropzone>
+                        </div>
                     </el-form-item>
                      <el-form-item>
                       <el-button @click="dialogReplyVisible=false">取消</el-button>
-                      <el-button type="primary" @click="onSubmit()">回复</el-button>
+                      <el-button type="primary" @click="onSubmit(scope.row)">回复</el-button>
                     </el-form-item>
                 </el-form>
             </el-dialog>
@@ -132,7 +135,7 @@
             </el-dialog>
              <el-button v-if="scope.row.STATUE==='正常'" size="mini" type="danger" @click="handleDelete(scope.row)">举报</el-button>
              <el-button type="primary" size="mini" @click="handleShow(scope.row)" >查看</el-button>
-             <el-button type="success" size="mini" @click="handleReply(scope.row)">回复</el-button>
+             <el-button v-if="scope.row.STATUE==='正常'" type="success" size="mini" @click="handleReply(scope.row)">回复</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -158,23 +161,17 @@
             </el-form-item>
           </el-form>
         </el-dialog>
-        <image-cropper :width="300" :height="300" url="http://localhost:9090/file/profile" 
-        @close='close'
-        @crop-upload-success="cropSuccess"
-        @crop-success="crop"
-        :key="imagecropperKey" v-show="imagecropperShow" img-format="jpg"></image-cropper>
       <pagination v-on:handleChange="handleCurrentChange" :count="count"></pagination>
   </div>
 </template>
 
 <script>
-import { getAllCommentsByUserId } from '@/api/comment'
+import { getAllCommentsByUserId, replyComment } from '@/api/comment'
 import { getArticleById } from '@/api/article'
 import { report } from '@/api/report'
 import pagination from '../../../components/pagination'
 import { getUserById } from '@/api/user'
-import ImageCropper from '@/components/ImageCropper'
-import PanThumb from '@/components/PanThumb'
+import Dropzone from '../../../components/Dropzone'
 export default {
   data() {
     return {
@@ -223,7 +220,7 @@ export default {
         if (item.STATUE === 0) {
           data[i].STATUE = '正常'
         } else {
-          data[i].TYPE = '已删除'
+          data[i].STATUE = '已删除'
         }
       }, this)
       return data
@@ -249,7 +246,7 @@ export default {
       return data
     }
   },
-  components: { getAllCommentsByUserId, pagination, getUserById, ImageCropper, PanThumb, getArticleById, report },
+  components: { getAllCommentsByUserId, pagination, getUserById, Dropzone, getArticleById, report, replyComment },
   created() {
     this.getComment(this.page)
   },
@@ -286,8 +283,23 @@ export default {
       // 打开回复对话框
       this.dialogReplyVisible = true
     },
-    onSubmit() {
+    onSubmit(row) {
       // 回复内容
+      replyComment(row.USER_ID, row.ID, this.reply.desc, this.reply.url).then(response => {
+        if (response.code === 20000) {
+          this.$message({
+            type: 'success',
+            message: '回复成功'
+          })
+          this.dialogReplyVisible = false
+        } else {
+          this.$message({
+            type: 'info',
+            message: '回复失败,请重试'
+          })
+        }
+        this.$refs['reply'].resetFields()
+      })
     },
     handleContentMore(content) {
       // 查看更多内容
@@ -364,6 +376,17 @@ export default {
       } else {
         this.disabledOther = true
       }
+    },
+    dropzoneS(file) {
+      var json = JSON.parse(file.xhr.response)
+      if (json.data !== null && json.data.length !== 0) {
+        this.reply.url = json.data[0]
+      }
+      console.log(this.reply.url)
+      this.$message({ message: '上传成功', type: 'success' })
+    },
+    dropzoneR(file) {
+      this.$message({ message: '删除成功', type: 'success' })
     }
   }
 }
