@@ -172,6 +172,7 @@ import { report } from '@/api/report'
 import pagination from '../../../components/pagination'
 import { getUserById } from '@/api/user'
 import Dropzone from '../../../components/Dropzone'
+import { parseTime } from '@/utils/index'
 export default {
   data() {
     return {
@@ -222,6 +223,8 @@ export default {
         } else {
           data[i].STATUE = '已删除'
         }
+        var created = item.CREATED
+        data[i].CREATED = parseTime(created, '{y}-{m}-{d} {h}:{i}')
       }, this)
       return data
     },
@@ -246,7 +249,7 @@ export default {
       return data
     }
   },
-  components: { getAllCommentsByUserId, pagination, getUserById, Dropzone, getArticleById, report, replyComment },
+  components: { getAllCommentsByUserId, pagination, getUserById, Dropzone, getArticleById, report, replyComment, parseTime },
   created() {
     this.getComment(this.page)
   },

@@ -73,10 +73,10 @@
             width="120"
             align="center">
             <template slot-scope="scope">
-              <el-dialog title="内容详情" :visible.sync="dialogTableVisible">
-                <div v-html="scope.row.CONTENT"></div>
+              <el-dialog title="内容详情" :visible.sync="dialogTableVisible" width="1000px">
+                <div v-html="content"></div>
               </el-dialog>
-              <el-button @click="handleContentMore()">查看内容</el-button>
+              <el-button @click="handleContentMore(scope.row)">查看内容</el-button>
             </template>
           </el-table-column>
           <el-table-column
@@ -253,9 +253,10 @@ export default {
         this.userData = response.data
       })
     },
-    handleContentMore(CONTENT) {
+    handleContentMore(row) {
       // 查看内容
       this.dialogTableVisible = true
+      this.content = row.CONTENT
     }
   }
 }

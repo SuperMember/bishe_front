@@ -1,7 +1,7 @@
 <template>
   <div style="margin:10px;">
     <el-table
-    :data="tableData"
+    :data="transTableData"
     border fit
     style="width: 100%">
     <el-table-column
@@ -100,7 +100,7 @@
     <el-table-column
       label="点赞数"
       align="center"
-      width="120">
+      width="100">
       <template slot-scope="scope">
         <el-tag>{{scope.row.COUNT}}</el-tag>
       </template>
@@ -108,7 +108,7 @@
     <el-table-column
       label="时间"
       align="center"
-      width="130">
+      width="140">
       <template slot-scope="scope">
         <el-tag type="danger">{{scope.row.CREATED}}</el-tag>
       </template>
@@ -127,9 +127,10 @@
 </template>
 
 <script>
-import { getReplyByUserId, getCommentById } from '@/api/comment'
+import { getReplyByUserId, getCommentById, deleteReply } from '@/api/comment'
 import pagination from '../../../components/pagination'
 import { getUserById } from '@/api/user'
+import { parseTime } from '@/utils/index'
 export default {
   data() {
     return {
@@ -143,15 +144,25 @@ export default {
       commentData: {}
     }
   },
-  components: { getReplyByUserId, pagination, getUserById, getCommentById },
+  components: { getReplyByUserId, pagination, getUserById, getCommentById, parseTime, deleteReply },
   created() { this.getReplys(this.page) },
   computed: {
+    transTableData() {
+      var data = this.tableData
+      data.forEach(function(item, i) {
+        var created = item['CREATED']
+        data[i]['CREATED'] = parseTime(created, '{y}-{m}-{d} {h}:{i}')
+      }, this)
+      return data
+    },
     transData() {
       var data = this.userData
       var sex = data.SEX
       var statue = data.STATUE
       if (sex === 0) { data.SEX = 'icon_man' } else { data.SEX = 'icon_woman' }
       if (statue === false) { data.STATUE = '正常' } else { data.STATUE = '小黑屋' }
+      var created = data.CREATED
+      data.CREATED = parseTime(created, '{y}-{m}-{d} {h}:{i}')
       return data
     },
     transFormData() {
@@ -170,6 +181,9 @@ export default {
       } else {
         data.STATUE = '已删除'
       }
+
+      var created = data.CREATED
+      data.CREATED = parseTime(created, '{y}-{m}-{d} {h}:{i}')
       return data
     }
   },
@@ -202,6 +216,34 @@ export default {
     handleHover(id) {
       getUserById(id).then(response => {
         this.userData = response.data
+      })
+    },
+    handleDelete(row) {
+      // 删除评论
+      this.$confirm('确定要删除该评论吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteReply(row.ID).then(response => {
+          if (response.code === 20000) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.getReplys(this.page)
+          } else {
+            this.$message({
+              type: 'info',
+              message: '删除失败'
+            })
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消删除'
+        })
       })
     }
   }

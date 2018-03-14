@@ -123,7 +123,7 @@
     </el-table-column>
     <el-table-column
       label="举报时间"
-      width="130"
+      width="140"
       align="center">
         <template slot-scope="scope">
               <el-tag type="danger">{{scope.row.CREATED}}</el-tag>
@@ -217,6 +217,7 @@
 import pagination from '../../../components/pagination'
 import { getReport, getReportByType, setReportStatue } from '@/api/report'
 import { getUserById } from '@/api/user'
+import { parseTime } from '@/utils/index'
 export default {
   data() {
     return {
@@ -254,6 +255,8 @@ export default {
       } else {
         data.TYPE = '文章'
       }
+      var created = data.CREATED
+      data.CREATED = parseTime(created, '{y}-{m}-{d} {h}:{i}')
       return data
     },
     transFormData() {
@@ -274,6 +277,8 @@ export default {
       } else {
         data.STATUE = '审核通过'
       }
+      var created = data.CREATED
+      data.CREATED = parseTime(created, '{y}-{m}-{d} {h}:{i}')
       return data
     },
     transTableData() {
@@ -304,6 +309,9 @@ export default {
         } else {
           data[i].RESULT = '举报失败'
         }
+
+        var created = item.CREATED
+        data[i].CREATED = parseTime(created, '{y}-{m}-{d} {h}:{i}')
       }, this)
       return data
     },
@@ -316,7 +324,7 @@ export default {
       return data
     }
   },
-  components: { pagination, getReport, getUserById, getReportByType, setReportStatue },
+  components: { pagination, getReport, getUserById, getReportByType, setReportStatue, parseTime },
   created() {
     this.getReports(this.page, this.type, this.result)
   },

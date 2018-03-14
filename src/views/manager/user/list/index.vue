@@ -102,6 +102,7 @@
 
 <script>
 import { getUser, setUserStatue } from '@/api/user'
+import { parseTime } from '@/utils/index'
 import pagination from '../../../../components/pagination'
 import SvgIcon from '../../../../components/SvgIcon'
 export default {
@@ -131,11 +132,13 @@ export default {
       data.forEach(function(item, i) {
         var sex = item['SEX'] === 0 ? 'icon_man' : 'icon_woman'
         data[i]['SEX'] = sex
+        var created = item['CREATED']
+        data[i]['CREATED'] = parseTime(created, '{y}-{m}-{d} {h}:{i}')
       }, this)
       return data
     }
   },
-  components: { getUser, setUserStatue, pagination, SvgIcon },
+  components: { getUser, setUserStatue, pagination, SvgIcon, parseTime },
   created() {
     this.getUserDate(this.statue, 1)
   },

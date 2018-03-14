@@ -20,6 +20,17 @@ export function deleteComment(id, userId) {
   })
 }
 
+// 删除用户回复
+export function deleteReply(replyId) {
+  return request({
+    url: '/admin/manager/reply',
+    method: 'delete',
+    data: {
+      replyId: replyId
+    }
+  })
+}
+
 // 根据评论ID获取回复
 export function getReplyById(commentId, page) {
   return request({

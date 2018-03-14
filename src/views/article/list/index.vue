@@ -29,10 +29,10 @@
         width="200"
         align="center">
         <template slot-scope="scope">
-              <el-dialog title="内容详情" :visible.sync="dialogTableVisible" append-to-body>
-                <div v-html="scope.row.CONTENT"></div>
+              <el-dialog title="内容详情" :visible.sync="dialogTableVisible" append-to-body width="1000px">
+                <div v-html="content"></div>
               </el-dialog>
-              <el-button @click="handleContentMore()">查看内容</el-button>
+              <el-button @click="handleContentMore(scope.row)">查看内容</el-button>
         </template>
       </el-table-column>
       <el-table-column
@@ -64,6 +64,14 @@
         </template>
       </el-table-column>
       <el-table-column
+        align="center"
+        label="创建时间"
+        width="140">
+        <template slot-scope="scope">
+          <el-tag type="danger">{{scope.row.CREATED}}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
         label="操作"
         width="250"
         align="center">
@@ -76,7 +84,7 @@
         </template>
       </el-table-column>
     </el-table>
-     <el-dialog title="编辑" :visible.sync="dialogUpdateVisible" append-to-body>
+     <el-dialog title="编辑" :visible.sync="dialogUpdateVisible" append-to-body width="1000px" @close="close">
         <el-form ref="form" :model="form" label-width="80px" :rules="rules">
         <el-form-item label="正标题" prop="TITLE">
           <el-input v-model="form.TITLE"></el-input>
@@ -85,11 +93,12 @@
           <el-input v-model="form.STITLE"></el-input>
         </el-form-item>
         <el-form-item label="正文内容" prop="CONTENT">
-          <el-input type="textarea" v-model="form.CONTENT"></el-input>
+          <!-- <el-input type="textarea" v-model="form.CONTENT"></el-input> -->
+          <tinymce :height="200" v-model="form.CONTENT"></tinymce>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">修改</el-button>
           <el-button @click="cancelUpdate">取消</el-button>
+          <el-button type="primary" @click="onSubmit">修改</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -99,18 +108,21 @@
 </template>
 
 <script>
+import Tinymce from '../../../components/Tinymce'
 import { getArticleByStatueSelf, deleteArticle, setArticleStatue, updateArticle } from '@/api/article'
 import pagination from '../../../components/pagination'
+import { parseTime } from '@/utils/index'
 export default {
   data() {
     return {
-      articles: null,
+      articles: [],
       type: '0',
       page: 1,
       statue: '4',
       count: 0,
       dialogTableVisible: false,
       dialogUpdateVisible: false,
+      content: '',
       form: {},
       listLoading: true,
       rules: {
@@ -168,7 +180,7 @@ export default {
   created() {
     this.getArticle(this.statue, this.page, this.type)
   },
-  components: { getArticleByStatueSelf, pagination, deleteArticle, setArticleStatue, updateArticle },
+  components: { getArticleByStatueSelf, pagination, deleteArticle, setArticleStatue, updateArticle, parseTime, Tinymce },
   methods: {
     getArticle(statue, page, type) {
       this.listLoading = true
@@ -234,8 +246,9 @@ export default {
       this.statue = statue
       this.getArticle(statue, this.page, this.type)
     },
-    handleContentMore() {
+    handleContentMore(row) {
       this.dialogTableVisible = true
+      this.content = row.CONTENT
     },
     handleUpdate(row) {
       this.dialogUpdateVisible = true
@@ -290,6 +303,9 @@ export default {
           message: '已取消发布'
         })
       })
+    },
+    close() {
+      this.$refs['form'].clearValidate()
     }
   }
 }

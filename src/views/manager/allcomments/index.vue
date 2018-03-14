@@ -198,6 +198,14 @@
             </template>
           </el-table-column>
           <el-table-column
+            label="创建时间"
+            width="150"
+            align="center">
+            <template slot-scope="scope">
+              <el-tag type="danger">{{scope.row.CREATED}}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
             align="center"
             label="操作"
             width="80">
@@ -216,6 +224,7 @@
 <script>
 import { getAllComments, deleteComment, getReplyById } from '@/api/comment'
 import { getUserById } from '@/api/user'
+import { parseTime } from '@/utils/index'
 import pagination from '../../../components/pagination'
 import SvgIcon from '../../../components/SvgIcon'
 export default {
@@ -247,6 +256,8 @@ export default {
         } else {
           data[i]['TYPE'] = '作家'
         }
+        var created = item['CREATED']
+        data[i]['CREATED'] = parseTime(created, '{y}-{m}-{d} {h}:{i}')
       }, this)
       return data
     },
@@ -270,7 +281,7 @@ export default {
     }
   },
   components: {
-    getAllComments, pagination, deleteComment, getReplyById, SvgIcon, getUserById
+    getAllComments, pagination, deleteComment, getReplyById, SvgIcon, getUserById, parseTime
   },
   created() {
     this.getComments(this.statue, this.type, 1)
@@ -308,7 +319,7 @@ export default {
         })
       }).catch(() => {
         // 取消
-        row.STATUE = !this.currentStatue
+        // row.STATUE = !this.currentStatue
         this.$message({
           type: 'info',
           message: '已取消删除'

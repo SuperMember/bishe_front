@@ -1,10 +1,18 @@
 import request from '@/utils/request'
 
 // 发表文章
-export function publish(page) {
+export function publish(form, type, statue) {
+  console.log(form)
   return request({
-    url: '/table/list/data?page=' + page,
-    method: 'get'
+    url: '/manager/article/list',
+    method: 'post',
+    data: {
+      title: form.bigtitle,
+      stitle: form.smalltitle,
+      content: form.content,
+      type: type,
+      statue: statue === '发表' ? 1 : 0
+    }
   })
 }
 
