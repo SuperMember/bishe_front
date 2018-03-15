@@ -1,8 +1,7 @@
 import request from '@/utils/request'
 
 // 发表文章
-export function publish(form, type, statue) {
-  console.log(form)
+export function publish(form, type, status) {
   return request({
     url: '/manager/article/list',
     method: 'post',
@@ -11,7 +10,7 @@ export function publish(form, type, statue) {
       stitle: form.smalltitle,
       content: form.content,
       type: type,
-      statue: statue === '发表' ? 1 : 0
+      status: status === '发表' ? 1 : 0
     }
   })
 }
@@ -56,7 +55,7 @@ export function deleteArticle(articleId) {
 }
 
 // 修改文章内容
-export function updateArticle(form) {
+export function updateArticle(form, id) {
   return request({
     url: '/admin/manager/article',
     method: 'put',
@@ -64,7 +63,7 @@ export function updateArticle(form) {
       title: form.TITLE,
       stitle: form.STITLE,
       content: form.CONTENT,
-      articleId: form.ID
+      articleId: id
     }
   })
 }

@@ -74,7 +74,14 @@
             align="center">
             <template slot-scope="scope">
               <el-dialog title="内容详情" :visible.sync="dialogTableVisible" width="1000px">
-                <div v-html="content"></div>
+                <div v-html="content" v-if="contentType==='原创'"></div>
+                <div v-else>
+                  <video-player  class="video-player-box" 
+                      ref="videoPlayer"
+                      :options="playerOptions"
+                      :playsinline="true">
+                  </video-player>
+                </div>
               </el-dialog>
               <el-button @click="handleContentMore(scope.row)">查看内容</el-button>
             </template>
@@ -84,7 +91,7 @@
             width="150"
             align="center">
             <template slot-scope="scope"> 
-                  <el-select v-model="scope.row.STATUE" placeholder="请选择" @change="handlerSelectChange(scope.row)">
+                  <el-select v-model="scope.row.STATUE" :disabled="scope.row.STATUE===3?true:false" placeholder="请选择" @change="handlerSelectChange(scope.row)">
                     <el-option
                       v-for="item in options"
                       :key="item.value"
@@ -130,6 +137,7 @@
 import { getArticleByStatue, setArticleStatue } from '@/api/article'
 import pagination from '../../../components/pagination'
 import { getUserById } from '@/api/user'
+import VueVideoPlayer from 'vue-video-player'
 export default {
   data() {
     return {
@@ -138,13 +146,11 @@ export default {
       count: 0,
       page: 1,
       loading: true,
+      contentType: '',
+      content: '',
       userData: {},
       dialogTableVisible: false,
       options: [
-        {
-          value: 0,
-          label: '保存'
-        },
         {
           value: 1,
           label: '审核中'
@@ -157,13 +163,25 @@ export default {
           value: 3,
           label: '审核通过'
         }
-      ]
+      ],
+      playerOptions: {
+        muted: true,
+        language: 'en',
+        playbackRates: [0.7, 1.0, 1.5, 2.0],
+        sources: [{
+          type: 'video/mp4',
+          src: ''
+        }]
+      }
     }
   },
   created() {
     this.getArticles(this.type, this.page)
   },
   computed: {
+    player() {
+      return this.$refs.videoPlayer.player
+    },
     transArticle() {
       var data = this.articles
       data.forEach(function(item, i) {
@@ -193,7 +211,7 @@ export default {
       return statusMap[type]
     }
   },
-  components: { getArticleByStatue, pagination, setArticleStatue, getUserById },
+  components: { getArticleByStatue, pagination, setArticleStatue, getUserById, VueVideoPlayer },
   methods: {
     getArticles(statue, page) {
       getArticleByStatue(statue, page).then(response => {
@@ -256,7 +274,14 @@ export default {
     handleContentMore(row) {
       // 查看内容
       this.dialogTableVisible = true
-      this.content = row.CONTENT
+      this.contentType = row.TYPE
+      if (row.TYPE === '原创') {
+        // 文章
+        this.content = row.CONTENT
+      } else {
+        // 视频
+        this.playerOptions.sources[0].src = row.CONTENT
+      }
     }
   }
 }

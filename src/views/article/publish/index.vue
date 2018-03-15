@@ -22,7 +22,19 @@
               </el-radio-group>
               <div>
                 <el-input v-model="form.content" v-if="video===0"></el-input>
-                <div v-else></div>
+                <div v-else>
+                  <el-upload
+                    class="upload-demo"
+                    drag
+                    action="http://localhost:9090/file/upload"
+                    :on-success="success"
+                    :on-remove="remove"
+                    :limit=1
+                    multiple>
+                    <i class="el-icon-upload"></i>
+                    <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                  </el-upload>
+                </div>
               </div>
             </div>
           </el-form-item>
@@ -136,6 +148,14 @@ export default {
       } else {
         this.video = 1
       }
+    },
+    success(response, file, fileList) {
+      // 上传成功
+      this.form.content = response.data[0]
+    },
+    remove(file, fileList) {
+      // 移除
+      this.form.content = null
     }
   }
 }

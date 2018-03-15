@@ -30,7 +30,15 @@
         align="center">
         <template slot-scope="scope">
               <el-dialog title="内容详情" :visible.sync="dialogTableVisible" append-to-body width="1000px">
-                <div v-html="content"></div>
+                <div v-html="content" v-if="type==='0'"></div>
+                <div v-else>
+                  <video-player  class="video-player-box"
+                      ref="videoPlayer"
+                      :options="playerOptions"
+                      :playsinline="true"
+                      >
+                      </video-player>
+                </div>
               </el-dialog>
               <el-button @click="handleContentMore(scope.row)">查看内容</el-button>
         </template>
@@ -76,7 +84,27 @@
         width="250"
         align="center">
         <template slot-scope="scope">
-          <el-button type="primary" v-if="scope.row.STATUE!==3" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+           <el-dialog title="编辑" :visible.sync="dialogUpdateVisible" append-to-body width="1000px" @close="close">
+              <el-form ref="form" :model="form" label-width="80px" :rules="rules">
+              <el-form-item label="正标题" prop="TITLE">
+                <el-input v-model="form.TITLE"></el-input>
+              </el-form-item>
+              <el-form-item label="副标题" prop="STITLE">
+                <el-input v-model="form.STITLE"></el-input>
+              </el-form-item>
+              <el-form-item label="正文内容" prop="CONTENT">
+                <!-- <el-input type="textarea" v-model="form.CONTENT"></el-input> -->
+                <div>
+                  <tinymce  v-model="form.CONTENT"></tinymce>
+                </div>
+              </el-form-item>
+              <el-form-item>
+                <el-button @click="cancelUpdate">取消</el-button>
+                <el-button type="primary" @click="onSubmit(scope.row)">修改</el-button>
+              </el-form-item>
+            </el-form>
+          </el-dialog>
+          <el-button type="primary" v-if="scope.row.STATUE!=='审核通过'" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button v-if="scope.row.STATUE==='保存'" size="mini" type="success" @click="handleModifyStatus(scope.row)">发布
           </el-button>
           <el-button  size="mini" type="danger" @click="handleDelete(scope.row)">删除
@@ -84,30 +112,14 @@
         </template>
       </el-table-column>
     </el-table>
-     <el-dialog title="编辑" :visible.sync="dialogUpdateVisible" append-to-body width="1000px" @close="close">
-        <el-form ref="form" :model="form" label-width="80px" :rules="rules">
-        <el-form-item label="正标题" prop="TITLE">
-          <el-input v-model="form.TITLE"></el-input>
-        </el-form-item>
-        <el-form-item label="副标题" prop="STITLE">
-          <el-input v-model="form.STITLE"></el-input>
-        </el-form-item>
-        <el-form-item label="正文内容" prop="CONTENT">
-          <!-- <el-input type="textarea" v-model="form.CONTENT"></el-input> -->
-          <tinymce :height="200" v-model="form.CONTENT"></tinymce>
-        </el-form-item>
-        <el-form-item>
-          <el-button @click="cancelUpdate">取消</el-button>
-          <el-button type="primary" @click="onSubmit">修改</el-button>
-        </el-form-item>
-      </el-form>
-    </el-dialog>
+    
     <pagination v-on:handleChange="handleCurrentChange" :count="count"></pagination>
   </div>
   
 </template>
 
 <script>
+import VueVideoPlayer from 'vue-video-player'
 import Tinymce from '../../../components/Tinymce'
 import { getArticleByStatueSelf, deleteArticle, setArticleStatue, updateArticle } from '@/api/article'
 import pagination from '../../../components/pagination'
@@ -132,6 +144,15 @@ export default {
         STITLE: [
           { required: true, message: '请输入大标题', trigger: 'blur' }
         ]
+      },
+      playerOptions: {
+        muted: true,
+        language: 'en',
+        playbackRates: [0.7, 1.0, 1.5, 2.0],
+        sources: [{
+          type: 'video/mp4',
+          src: ''
+        }]
       }
     }
   },
@@ -154,6 +175,9 @@ export default {
     }
   },
   computed: {
+    player() {
+      return this.$refs.videoPlayer.player
+    },
     transData() {
       var data = this.articles
       data.forEach(function(item, i) {
@@ -180,7 +204,7 @@ export default {
   created() {
     this.getArticle(this.statue, this.page, this.type)
   },
-  components: { getArticleByStatueSelf, pagination, deleteArticle, setArticleStatue, updateArticle, parseTime, Tinymce },
+  components: { VueVideoPlayer, getArticleByStatueSelf, pagination, deleteArticle, setArticleStatue, updateArticle, parseTime, Tinymce },
   methods: {
     getArticle(statue, page, type) {
       this.listLoading = true
@@ -248,24 +272,30 @@ export default {
     },
     handleContentMore(row) {
       this.dialogTableVisible = true
-      this.content = row.CONTENT
+      if (this.type === '0') {
+        // 文章
+        this.content = row.CONTENT
+      } else {
+        // 视频
+        this.playerOptions.sources[0].src = row.CONTENT
+      }
     },
     handleUpdate(row) {
       this.dialogUpdateVisible = true
+      this.form.CONTENT = row.CONTENT
       this.form.TITLE = row.TITLE
       this.form.STITLE = row.STITLE
-      this.form.CONTENT = row.CONTENT
     },
     cancelUpdate() {
       // 取消修改
       this.dialogUpdateVisible = false
-      this.$refs['form'].clearValidate()
+      // this.$refs['form'].clearValidate()
     },
     onSubmit(row) {
       // 提交修改
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          updateArticle(this.form).then(response => {
+          updateArticle(this.form, row.ID).then(response => {
             if (response.code === 20000) {
               this.$message({
                 type: 'info',
@@ -305,7 +335,7 @@ export default {
       })
     },
     close() {
-      this.$refs['form'].clearValidate()
+      // this.$refs['form'].clearValidate()
     }
   }
 }
