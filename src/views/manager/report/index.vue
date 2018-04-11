@@ -5,7 +5,7 @@
           <el-radio-button label="3">全部</el-radio-button>
           <el-radio-button label="0">评论</el-radio-button>
           <el-radio-button label="1">文章</el-radio-button>
-          <el-radio-button label="2">图片</el-radio-button>
+          <el-radio-button label="2">回复</el-radio-button>
     </el-radio-group>
   <br/>
   <div style="margin-top:10px;">
@@ -191,13 +191,13 @@
                 <el-form-item label="内容">
                   <el-input v-model="transComment.CONTENT" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="评论状态">
+                <el-form-item label="评论状态" >
                   <el-tag type="warning">{{transComment.STATUE}}</el-tag>
                 </el-form-item>
-                <el-form-item label="图片" v-if="transComment.URL!=null">
+                <el-form-item label="图片" v-if="transComment.URL!=''">
                   <img v-if="transComment.URL!=null" :src="transComment.URL" style="height:100px;"/>
                 </el-form-item>
-                <el-form-item label="类型">
+                <el-form-item label="类型" v-if="transComment.TYPE!=undefined">
                   <el-tag type="success">{{transComment.TYPE}}</el-tag>
                 </el-form-item>
                 <el-form-item label="点赞数量">
@@ -289,7 +289,7 @@ export default {
         } else if (item.TYPE === 1) {
           data[i].TYPE = '文章'
         } else {
-          data[i].TYPE = '图片'
+          data[i].TYPE = '回复'
         }
 
         if (item.CONTENT === '0') {
@@ -319,21 +319,36 @@ export default {
       var data = this.userData
       var sex = data.SEX
       var statue = data.STATUE
-      if (sex === 0) { data.SEX = 'icon_man' } else { data.SEX = 'icon_woman' }
-      if (statue === false) { data.STATUE = '正常' } else { data.STATUE = '小黑屋' }
+      if (sex === 0) {
+        data.SEX = 'icon_man'
+      } else {
+        data.SEX = 'icon_woman'
+      }
+      if (statue === false) {
+        data.STATUE = '正常'
+      } else {
+        data.STATUE = '小黑屋'
+      }
       return data
     }
   },
-  components: { pagination, getReport, getUserById, getReportByType, setReportStatue, parseTime },
+  components: {
+    pagination,
+    getReport,
+    getUserById,
+    getReportByType,
+    setReportStatue,
+    parseTime
+  },
   created() {
     this.getReports(this.page, this.type, this.result)
   },
   filters: {
     typeFilter(type) {
       const statusMap = {
-        '评论': 'success',
-        '文章': 'danger',
-        '图片': 'info'
+        评论: 'success',
+        文章: 'danger',
+        图片: 'info'
       }
       return statusMap[type]
     }
@@ -370,7 +385,7 @@ export default {
       })
     },
     handleMore(row) {
-      if (row.TYPE === '评论') {
+      if (row.TYPE === '评论' || row.TYPE === '回复') {
         this.dialogMoreCommentVisible = true
       } else {
         this.dialogMoreArticleVisible = true
@@ -382,11 +397,12 @@ export default {
       } else if (row.TYPE === '文章') {
         type = '1'
       } else {
+        // 回复
         type = '2'
       }
       getReportByType(type, row.BELONG_ID).then(response => {
         if (response.code === 20000) {
-          if (type === '0') {
+          if (type === '0' || type === '2') {
             this.commentForm = response.data
           } else {
             this.articleForm = response.data
@@ -408,13 +424,19 @@ export default {
       } else {
         type = 2
       }
-      setReportStatue(parseInt(this.checkForm.result), type, row.ID, row.BELONG_ID, row.RUSER_ID).then(response => {
+      setReportStatue(
+        parseInt(this.checkForm.result),
+        type,
+        row.ID,
+        row.BELONG_ID,
+        row.RUSER_ID
+      ).then(response => {
         if (response.code === 20000) {
           this.$message({
             type: 'success',
             message: '审核成功'
           })
-          this.getReports(this.page, this.type)
+          this.getReports(this.page, this.type, this.result)
         } else {
           this.$message({
             type: 'info',
@@ -433,7 +455,7 @@ export default {
 </script>
 
 <style scoped>
-.line{
+.line {
   text-align: center;
 }
 </style>

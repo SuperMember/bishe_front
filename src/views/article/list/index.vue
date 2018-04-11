@@ -121,7 +121,12 @@
 <script>
 import VueVideoPlayer from 'vue-video-player'
 import Tinymce from '../../../components/Tinymce'
-import { getArticleByStatueSelf, deleteArticle, setArticleStatue, updateArticle } from '@/api/article'
+import {
+  getArticleByStatueSelf,
+  deleteArticle,
+  setArticleStatue,
+  updateArticle
+} from '@/api/article'
 import pagination from '../../../components/pagination'
 import { parseTime } from '@/utils/index'
 export default {
@@ -138,38 +143,36 @@ export default {
       form: {},
       listLoading: true,
       rules: {
-        TITLE: [
-          { required: true, message: '请输入正标题', trigger: 'blur' }
-        ],
-        STITLE: [
-          { required: true, message: '请输入大标题', trigger: 'blur' }
-        ]
+        TITLE: [{ required: true, message: '请输入正标题', trigger: 'blur' }],
+        STITLE: [{ required: true, message: '请输入大标题', trigger: 'blur' }]
       },
       playerOptions: {
         muted: true,
         language: 'en',
         playbackRates: [0.7, 1.0, 1.5, 2.0],
-        sources: [{
-          type: 'video/mp4',
-          src: ''
-        }]
+        sources: [
+          {
+            type: 'video/mp4',
+            src: ''
+          }
+        ]
       }
     }
   },
   filters: {
     typeFilter(type) {
       const statusMap = {
-        '原创': 'success',
-        '视频': 'info'
+        原创: 'success',
+        视频: 'info'
       }
       return statusMap[type]
     },
     statueFilter(statue) {
       const statusMap = {
-        '保存': 'info',
-        '审核中': 'warning',
-        '未通过': 'danger',
-        '审核通过': 'success'
+        保存: 'info',
+        审核中: 'warning',
+        未通过: 'danger',
+        审核通过: 'success'
       }
       return statusMap[statue]
     }
@@ -197,6 +200,9 @@ export default {
         } else {
           data[i]['STATUE'] = '审核通过'
         }
+
+        var created = item['CREATED']
+        data[i]['CREATED'] = parseTime(created, '{y}-{m}-{d} {h}:{i}')
       }, this)
       return data
     }
@@ -204,7 +210,16 @@ export default {
   created() {
     this.getArticle(this.statue, this.page, this.type)
   },
-  components: { VueVideoPlayer, getArticleByStatueSelf, pagination, deleteArticle, setArticleStatue, updateArticle, parseTime, Tinymce },
+  components: {
+    VueVideoPlayer,
+    getArticleByStatueSelf,
+    pagination,
+    deleteArticle,
+    setArticleStatue,
+    updateArticle,
+    parseTime,
+    Tinymce
+  },
   methods: {
     getArticle(statue, page, type) {
       this.listLoading = true
@@ -231,29 +246,31 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        // 删除评论
-        deleteArticle(row.ID + ',').then(response => {
-          if (response.code === 20000) {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            })
-            this.getArticle(this.statue, this.page, this.type)
-          } else {
-            this.$message({
-              type: 'info',
-              message: '删除失败,请重试'
-            })
-          }
-        })
-      }).catch(() => {
-        // 取消
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
       })
+        .then(() => {
+          // 删除评论
+          deleteArticle(row.ID + ',').then(response => {
+            if (response.code === 20000) {
+              this.$message({
+                type: 'success',
+                message: '删除成功'
+              })
+              this.getArticle(this.statue, this.page, this.type)
+            } else {
+              this.$message({
+                type: 'info',
+                message: '删除失败,请重试'
+              })
+            }
+          })
+        })
+        .catch(() => {
+          // 取消
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     handleClick: function() {
       // 查看
@@ -293,7 +310,7 @@ export default {
     },
     onSubmit(row) {
       // 提交修改
-      this.$refs['form'].validate((valid) => {
+      this.$refs['form'].validate(valid => {
         if (valid) {
           updateArticle(this.form, row.ID).then(response => {
             if (response.code === 20000) {
@@ -317,22 +334,24 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        // 修改
-        setArticleStatue(row.ID, 1).then(response => {
-          if (response.code === 20000) {
-          // 修改成功
-            this.dialogUpdateVisible = false
-            this.getArticle(this.statue, this.page, this.type)
-          }
-        })
-      }).catch(() => {
-        // 取消
-        this.$message({
-          type: 'info',
-          message: '已取消发布'
-        })
       })
+        .then(() => {
+          // 修改
+          setArticleStatue(row.ID, 1).then(response => {
+            if (response.code === 20000) {
+              // 修改成功
+              this.dialogUpdateVisible = false
+              this.getArticle(this.statue, this.page, this.type)
+            }
+          })
+        })
+        .catch(() => {
+          // 取消
+          this.$message({
+            type: 'info',
+            message: '已取消发布'
+          })
+        })
     },
     close() {
       // this.$refs['form'].clearValidate()
@@ -342,13 +361,13 @@ export default {
 </script>
 
 <style scoped>
-.el-radio-group{
+.el-radio-group {
   margin: 10px;
 }
-.type{
-  margin-left:10px;
+.type {
+  margin-left: 10px;
 }
-.el-table{
+.el-table {
   margin: 5px;
 }
 </style>

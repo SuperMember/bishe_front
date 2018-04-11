@@ -9,6 +9,7 @@ export function publish(form, type, status) {
       title: form.bigtitle,
       stitle: form.smalltitle,
       content: form.content,
+      img: form.imgUrl,
       type: type,
       status: status === '发表' ? 1 : 0
     }

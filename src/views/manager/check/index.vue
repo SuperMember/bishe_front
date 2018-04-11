@@ -138,6 +138,7 @@ import { getArticleByStatue, setArticleStatue } from '@/api/article'
 import pagination from '../../../components/pagination'
 import { getUserById } from '@/api/user'
 import VueVideoPlayer from 'vue-video-player'
+import { parseTime } from '@/utils/index'
 export default {
   data() {
     return {
@@ -168,10 +169,12 @@ export default {
         muted: true,
         language: 'en',
         playbackRates: [0.7, 1.0, 1.5, 2.0],
-        sources: [{
-          type: 'video/mp4',
-          src: ''
-        }]
+        sources: [
+          {
+            type: 'video/mp4',
+            src: ''
+          }
+        ]
       }
     }
   },
@@ -190,6 +193,8 @@ export default {
         } else {
           item.TYPE = '视频'
         }
+        var created = item['CREATED']
+        data[i]['CREATED'] = parseTime(created, '{y}-{m}-{d} {h}:{i}')
       }, this)
       return data
     },
@@ -197,21 +202,35 @@ export default {
       var data = this.userData
       var sex = data.SEX
       var statue = data.STATUE
-      if (sex === 0) { data.SEX = 'icon_man' } else { data.SEX = 'icon_woman' }
-      if (statue === false) { data.STATUE = '正常' } else { data.STATUE = '小黑屋' }
+      if (sex === 0) {
+        data.SEX = 'icon_man'
+      } else {
+        data.SEX = 'icon_woman'
+      }
+      if (statue === false) {
+        data.STATUE = '正常'
+      } else {
+        data.STATUE = '小黑屋'
+      }
       return data
     }
   },
   filters: {
     typeFilter(type) {
       const statusMap = {
-        '原创': 'success',
-        '视频': 'info'
+        原创: 'success',
+        视频: 'info'
       }
       return statusMap[type]
     }
   },
-  components: { getArticleByStatue, pagination, setArticleStatue, getUserById, VueVideoPlayer },
+  components: {
+    getArticleByStatue,
+    pagination,
+    setArticleStatue,
+    getUserById,
+    VueVideoPlayer
+  },
   methods: {
     getArticles(statue, page) {
       getArticleByStatue(statue, page).then(response => {
@@ -244,27 +263,29 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        setArticleStatue(row.ID, row.STATUE).then(response => {
-          if (response.code === 20000) {
-            this.$message({
-              type: 'success',
-              message: '修改成功'
-            })
-            this.getArticles(this.type, this.page)
-          } else {
-            this.$message({
-              type: 'info',
-              message: '修改失败,请重试'
-            })
-          }
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消修改'
-        })
       })
+        .then(() => {
+          setArticleStatue(row.ID, row.STATUE).then(response => {
+            if (response.code === 20000) {
+              this.$message({
+                type: 'success',
+                message: '修改成功'
+              })
+              this.getArticles(this.type, this.page)
+            } else {
+              this.$message({
+                type: 'info',
+                message: '修改失败,请重试'
+              })
+            }
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消修改'
+          })
+        })
     },
     handleHover(id) {
       getUserById(id).then(response => {
@@ -288,13 +309,13 @@ export default {
 </script>
 
 <style scoped>
-.line{
+.line {
   text-align: center;
 }
-.type{
-  margin-left:10px; 
+.type {
+  margin-left: 10px;
 }
-.el-radio-group{
+.el-radio-group {
   margin: 10px;
 }
 </style>

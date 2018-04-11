@@ -13,6 +13,17 @@
           <el-form-item label="要点" prop="smalltitle">
             <el-input v-model="form.smalltitle" placeholder="请输入小标题"></el-input>
           </el-form-item>
+          <el-form-item label="封面图片" prop="imgUrl">
+            <el-upload
+              class="upload-demo"
+              action="http://localhost:9090/file/upload"
+              :on-success="successImg"
+              :on-remove="removeImg"
+              :limit="1"
+              >
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </el-form-item>
           <el-form-item label="文章内容" prop="content">
             <tinymce :height="200" v-model="form.content" v-if="index===1"></tinymce>
             <div v-else>
@@ -68,19 +79,19 @@ export default {
           { required: true, message: '请输入要点', trigger: 'blur' },
           { min: 3, max: 50, message: '长度在 3 到 20 个字符', trigger: 'blur' }
         ]
-      }
+      },
+      imgUrl: ''
     }
   },
   components: {
-    Tinymce, publish
+    Tinymce,
+    publish
   },
 
-  created() {
-  },
+  created() {},
   methods: {
-
     onSubmit: function(flag) {
-      this.$refs['formData'].validate((valid) => {
+      this.$refs['formData'].validate(valid => {
         if (valid) {
           this.upData(1)
         } else {
@@ -93,8 +104,8 @@ export default {
       this.$refs[refName].resetFields()
     },
     onSave: function(flag) {
-    // 保存数据
-      this.$refs['formData'].validate((valid) => {
+      // 保存数据
+      this.$refs['formData'].validate(valid => {
         if (valid) {
           this.upData(0)
         } else {
@@ -110,28 +121,31 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        publish(this.form, this.type, type).then(response => {
-          if (response.code === 20000) {
-            this.$message({
-              type: 'success',
-              message: type + '成功!'
-            })
-            // 跳转到审核页面
-            this.$router.push({ path: '/article/list' })
-          } else {
-            this.$message({
-              type: 'info',
-              message: type + '失败!请重试'
-            })
-          }
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '取消' + type
-        })
       })
+        .then(() => {
+          this.form.imgUrl = this.imgUrl
+          publish(this.form, this.type, type).then(response => {
+            if (response.code === 20000) {
+              this.$message({
+                type: 'success',
+                message: type + '成功!'
+              })
+              // 跳转到审核页面
+              this.$router.push({ path: '/article/list' })
+            } else {
+              this.$message({
+                type: 'info',
+                message: type + '失败!请重试'
+              })
+            }
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消' + type
+          })
+        })
     },
     handlerTypeChange(type) {
       if (type === '0') {
@@ -156,6 +170,13 @@ export default {
     remove(file, fileList) {
       // 移除
       this.form.content = null
+    },
+    successImg(response, file, fileList) {
+      // 上传封面
+      this.imgUrl = response.data[0]
+    },
+    removeImg(file, fileList) {
+      this.imgUrl = null
     }
   }
 }
