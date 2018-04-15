@@ -19,42 +19,6 @@ import Layout from '../views/layout/Layout'
   }
 **/
 
-export const asyncRouterMap = [
-  {
-    path: '/manager',
-    component: Layout,
-    redirect: '/manager/user',
-    name: 'Manager',
-    meta: { title: '管理', icon: 'example', role: [{ 'authority': 'admin' }] },
-    children: [
-      {
-        path: 'list',
-        name: 'list',
-        component: _import('manager/user/list/index'),
-        meta: { title: '用户列表', icon: 'form' }
-      },
-      {
-        path: './allcomments',
-        name: './allcomments',
-        component: _import('manager/allcomments/index'),
-        meta: { title: '评论列表', icon: 'form' }
-      },
-      {
-        path: './check',
-        name: './check',
-        component: _import('manager/check/index'),
-        meta: { title: '审核列表', icon: 'form' }
-      },
-      {
-        path: './report',
-        name: './report',
-        component: _import('manager/report/index'),
-        meta: { title: '举报列表', icon: 'form' }
-      }
-    ]
-  }
-
-]
 export const constantRouterMap = [
   { path: '/login', component: _import('login/index'), hidden: true },
   { path: '/404', component: _import('404'), hidden: true },
@@ -128,13 +92,22 @@ export const constantRouterMap = [
         meta: { title: '文章列表', icon: 'form' }
       }
     ]
-  },
+  }
+]
+
+export default new Router({
+  // mode: 'history', //后端支持可开
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRouterMap
+})
+
+export const asyncRouterMap = [
   {
     path: '/manager',
     component: Layout,
     redirect: '/manager/user',
     name: 'Manager',
-    meta: { title: '管理', icon: 'example', role: [{ 'authority': 'admin' }] },
+    meta: { title: '管理', icon: 'example', role: ['admin'] },
     children: [
       {
         path: 'list',
@@ -163,11 +136,5 @@ export const constantRouterMap = [
     ]
   },
   { path: '*', redirect: '/404', hidden: true }
+
 ]
-
-export default new Router({
-  // mode: 'history', //后端支持可开
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRouterMap
-})
-
